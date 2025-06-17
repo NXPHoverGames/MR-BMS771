@@ -57,7 +57,7 @@
 #define PARAMETER_ARRAY_SIZE   NONE + EXTRA_GET_AND_SET_PARS
 
 #define BMS_MAJOR_VERSION_NUMBER 7
-#define BMS_MINOR_VERSION_NUMBER 0
+#define BMS_MINOR_VERSION_NUMBER 1
 
 /*******************************************************************************
  * types

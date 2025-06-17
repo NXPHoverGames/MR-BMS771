@@ -119,7 +119,7 @@
 #   define V_BATT_MAX                       V_OUT_MAX           //!< [V]
 #   define V_BATT_MIN                       V_OUT_MIN           //!< [V]
 #   define N_CELLS_MAX                      14                  //!< [-]
-#   define N_CELLS_MIN                      8                   //!< [-]
+#   define N_CELLS_MIN                      7                   //!< [-]
 #endif
 #define V_CELL1_MAX                         5                   //!< [V]
 #define V_CELL1_MIN                         0                   //!< [V]
