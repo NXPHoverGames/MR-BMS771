@@ -1,0 +1,13 @@
+############################################################################
+# apps/nxp_bms/bms/Make.defs
+# Adds selected applications to apps/ build
+# 
+# Copyright 2020,2025 NXP
+# 
+# SPDX-License-Identifier: BSD-3-Clause
+#
+############################################################################
+
+ifneq ($(CONFIG_NXP_BMS),)
+CONFIGURED_APPS += $(APPDIR)/nxp_bms/BMS_v1
+endif

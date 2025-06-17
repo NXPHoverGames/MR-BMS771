@@ -1,0 +1,3 @@
+[submodule "software/rddrone-bms772/src/nxp_bms/BMS_v1/public_regulated_data_types"]
+	path = software/bms77x/src/nxp_bms/BMS_v1/public_regulated_data_types
+	url = https://github.com/PX4/public_regulated_data_types

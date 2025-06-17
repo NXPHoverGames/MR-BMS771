@@ -1,0 +1,5717 @@
+From 5a4d0c4d6415bce8f9e9ad57f755d68cfaa78932 Mon Sep 17 00:00:00 2001
+From: nxf63123 <cis.van.mierlo@nxp.com>
+Date: Wed, 16 Apr 2025 10:13:28 +0200
+Subject: [PATCH] github nuttx patch on release6.0_11.0 for bms771 files
+
+---
+ arch/arm/src/s32k1xx/Kconfig                  | 155 +++
+ arch/arm/src/s32k1xx/s32k1xx_lpspi.c          |  23 +
+ arch/arm/src/s32k1xx/s32k1xx_serial.c         |   4 +-
+ boards/Kconfig                                |  12 +
+ boards/arm/s32k1xx/mr-bms771/Kconfig          |  27 +
+ boards/arm/s32k1xx/mr-bms771/README.txt       | 142 +++
+ .../s32k1xx/mr-bms771/configs/bms/defconfig   | 142 +++
+ .../mr-bms771/configs/bmsdebug/defconfig      | 150 +++
+ .../mr-bms771/configs/bmstrace/defconfig      | 159 +++
+ .../s32k1xx/mr-bms771/configs/nsh/defconfig   |  43 +
+ boards/arm/s32k1xx/mr-bms771/include/board.h  | 156 +++
+ .../s32k1xx/mr-bms771/include/nsh_romfsimg.h  |  90 ++
+ .../mr-bms771/include/rc.sysinit.template     |   8 +
+ .../s32k1xx/mr-bms771/include/rcS.template    |   7 +
+ .../arm/s32k1xx/mr-bms771/include/smbus_sbd.h | 201 ++++
+ .../arm/s32k1xx/mr-bms771/scripts/Make.defs   |  49 +
+ boards/arm/s32k1xx/mr-bms771/scripts/flash.ld | 139 +++
+ .../s32k1xx/mr-bms771/scripts/mr-bms771.jlink |  21 +
+ .../arm/s32k1xx/mr-bms771/scripts/s32k146.cfg |  61 ++
+ boards/arm/s32k1xx/mr-bms771/scripts/sram.ld  | 116 +++
+ boards/arm/s32k1xx/mr-bms771/src/Makefile     |  70 ++
+ boards/arm/s32k1xx/mr-bms771/src/mr-bms771.h  | 162 +++
+ .../s32k1xx/mr-bms771/src/s32k1xx_appinit.c   |  82 ++
+ .../s32k1xx/mr-bms771/src/s32k1xx_autoleds.c  | 150 +++
+ .../arm/s32k1xx/mr-bms771/src/s32k1xx_boot.c  |  82 ++
+ .../s32k1xx/mr-bms771/src/s32k1xx_bringup.c   | 242 +++++
+ .../mr-bms771/src/s32k1xx_clockconfig.c       | 181 ++++
+ .../arm/s32k1xx/mr-bms771/src/s32k1xx_gpio.c  | 494 ++++++++++
+ .../arm/s32k1xx/mr-bms771/src/s32k1xx_i2c.c   |  84 ++
+ .../mr-bms771/src/s32k1xx_nrstcheck_procfs.c  | 329 +++++++
+ .../mr-bms771/src/s32k1xx_periphclocks.c      | 148 +++
+ .../arm/s32k1xx/mr-bms771/src/s32k1xx_reset.c |  66 ++
+ .../s32k1xx/mr-bms771/src/s32k1xx_smbus_sbd.c | 925 ++++++++++++++++++
+ .../arm/s32k1xx/mr-bms771/src/s32k1xx_spi.c   | 169 ++++
+ .../s32k1xx/mr-bms771/src/s32k1xx_ssd1306.c   | 113 +++
+ .../arm/s32k1xx/mr-bms771/src/s32k1xx_uid.c   |  67 ++
+ .../s32k1xx/mr-bms771/src/s32k1xx_userleds.c  | 122 +++
+ boards/arm/s32k1xx/rddrone-bms772/Kconfig     | 155 ---
+ 38 files changed, 5190 insertions(+), 156 deletions(-)
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/Kconfig
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/README.txt
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/configs/bms/defconfig
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/configs/bmsdebug/defconfig
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/configs/bmstrace/defconfig
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/configs/nsh/defconfig
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/include/board.h
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/include/nsh_romfsimg.h
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/include/rc.sysinit.template
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/include/rcS.template
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/include/smbus_sbd.h
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/scripts/Make.defs
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/scripts/flash.ld
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/scripts/mr-bms771.jlink
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/scripts/s32k146.cfg
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/scripts/sram.ld
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/Makefile
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/mr-bms771.h
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_appinit.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_autoleds.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_boot.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_bringup.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_clockconfig.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_gpio.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_i2c.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_nrstcheck_procfs.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_periphclocks.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_reset.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_smbus_sbd.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_spi.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_ssd1306.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_uid.c
+ create mode 100644 boards/arm/s32k1xx/mr-bms771/src/s32k1xx_userleds.c
+
+diff --git a/arch/arm/src/s32k1xx/Kconfig b/arch/arm/src/s32k1xx/Kconfig
+index a2c0f578c1..cbeae097f4 100644
+--- a/arch/arm/src/s32k1xx/Kconfig
++++ b/arch/arm/src/s32k1xx/Kconfig
+@@ -973,4 +973,159 @@ config PROGMEM_SIZE
+ 
+ endmenu
+ 
++menu "arch PM configuration"
++depends on PM
++
++menu "PM configuration for PM_STANDBY mode"
++
++choice
++	prompt "MCU power mode during PM_STANDBY"
++	default VLPR_STANDBY
++
++config RUN_STANDBY
++	bool "MCU in RUN mode during PM_STANDBY"
++	---help---
++		The MCU should remain in RUN mode during PM_STANDBY
++
++config VLPR_STANDBY
++	bool "MCU in VLPR mode during PM_STANDBY"
++	---help---
++		The MCU should enter VLPR (very low power run) mode during PM_STANDBY
++
++endchoice # MCU power mode
++
++menuconfig PM_SPI_STANDBY
++	bool "Enable SPI in PM_STANDBY mode"
++	default n
++	depends on SPI
++	---help---
++		Enable PM configuration for SPI
++
++if PM_SPI_STANDBY
++
++config PM_SPI0_STANDBY
++	bool "Enable LPSPI0 in PM_STANDBY mode"
++	default n
++	depends on S32K1XX_LPSPI0
++
++config PM_SPI1_STANDBY
++	bool "Enable LPSPI1 in PM_STANDBY mode"
++	default n
++	depends on S32K1XX_LPSPI1
++
++endif # PM_SPI_STANDBY
++
++menuconfig PM_SERIAL_STANDBY
++	bool "Enable serial in PM_STANDBY mode"
++	default n
++	depends on SERIAL
++	---help---
++		Enable PM configuration for SERIAL
++
++if PM_SERIAL_STANDBY
++
++config PM_CONSOLE_STANDBY
++	bool "Enable serial console in PM_STANDBY"
++	default n
++	depends on SERIAL_CONSOLE
++	select PM_SERIAL0_STANDBY if LPUART0_SERIAL_CONSOLE
++	select PM_SERIAL1_STANDBY if LPUART1_SERIAL_CONSOLE
++	select PM_SERIAL2_STANDBY if LPUART2_SERIAL_CONSOLE
++
++config PM_SERIAL0_STANDBY
++	bool "Enable LPUART0 in PM_STANDBY mode"
++	default n
++	depends on S32K1XX_LPUART0
++
++config PM_SERIAL1_STANDBY
++	bool "Enable LPUART1 in PM_STANDBY mode"
++	default n
++	depends on S32K1XX_LPUART1
++
++config PM_SERIAL2_STANDBY
++	bool "Enable LPUART2 in PM_STANDBY mode"
++	default n
++	depends on S32K1XX_LPUART2
++
++endif # PM_SERIAL_STANDBY
++
++endmenu # PM configuration for PM_STANDBY mode
++
++menu "PM configuration for PM_SLEEP mode"
++
++choice
++	prompt "MCU power mode during PM_SLEEP"
++	default VLPR_SLEEP
++
++config RUN_SLEEP
++	bool "MCU in RUN mode during PM_SLEEP"
++	---help---
++		The MCU should remain in RUN mode during PM_SLEEP
++
++config VLPR_SLEEP
++	bool "MCU in VLPR mode during PM_SLEEP"
++	---help---
++		The MCU should enter VLPR (very low power run) mode during PM_SLEEP
++
++endchoice # MCU power mode
++
++menuconfig PM_SPI_SLEEP
++	bool "Enable SPI in PM_SLEEP mode"
++	default n
++	depends on SPI
++	---help---
++		Enable PM configuration for SPI
++
++if PM_SPI_SLEEP
++
++menuconfig PM_SPI0_SLEEP
++	bool "Enable LPSPI0 in PM_SLEEP"
++	default n
++	depends on S32K1XX_LPSPI0
++
++menuconfig PM_SPI1_SLEEP
++	bool "Enable LPSPI1 in PM_SLEEP"
++	default n
++	depends on S32K1XX_LPSPI1
++
++endif # PM_SPI_SLEEP
++
++menuconfig PM_SERIAL_SLEEP
++	bool "Enable serial in PM_SLEEP mode"
++	default n
++	depends on SERIAL
++	---help---
++		Enable PM configuration for SERIAL
++
++if PM_SERIAL_SLEEP
++
++config PM_CONSOLE_SLEEP
++	bool "Enable serial console in PM_SLEEP"
++	default n
++	depends on SERIAL_CONSOLE
++	select PM_SERIAL0_SLEEP if LPUART0_SERIAL_CONSOLE
++	select PM_SERIAL1_SLEEP if LPUART1_SERIAL_CONSOLE
++	select PM_SERIAL2_SLEEP if LPUART2_SERIAL_CONSOLE
++
++config PM_SERIAL0_SLEEP
++	bool "Enable LPUART0 in PM_SLEEP mode"
++	default n
++	depends on S32K1XX_LPUART0
++
++config PM_SERIAL1_SLEEP
++	bool "Enable LPUART1 in PM_SLEEP mode"
++	default n
++	depends on S32K1XX_LPUART1
++
++config PM_SERIAL2_SLEEP
++	bool "Enable LPUART2 in PM_SLEEP mode"
++	default n
++	depends on S32K1XX_LPUART2
++
++endif # PM_SERIAL_SLEEP
++
++endmenu # PM configuration for PM_SLEEP mode
++
++endmenu # arch PM configuration
++
+ endif # ARCH_CHIP_S32K1XX
+diff --git a/arch/arm/src/s32k1xx/s32k1xx_lpspi.c b/arch/arm/src/s32k1xx/s32k1xx_lpspi.c
+index ff6b12a7dd..c3546f7bcd 100644
+--- a/arch/arm/src/s32k1xx/s32k1xx_lpspi.c
++++ b/arch/arm/src/s32k1xx/s32k1xx_lpspi.c
+@@ -47,6 +47,8 @@
+  *
+  ****************************************************************************/
+ 
++/* Copyright 2025 NXP */
++
+ /****************************************************************************
+  * Included Files
+  ****************************************************************************/
+@@ -1539,8 +1541,18 @@ static void s32k1xx_lpspi_exchange_nodma(struct spi_dev_s *dev,
+                    src += 5;
+                    dwords = true;
+                    break;
++              case 48:
++                   word = __builtin_bswap32(*(uint32_t *)&src[0]);
++                    // &scr[0]);(src[0] << 24) + (src[1] << 16)
++                    //       + (src[2] << 8) + src[3];
++                   word1 = (src[4] << 8) + src[5];
++                   src += 6;
++                   dwords = true;
++                   break;
+ #endif
+               default:
++              spierr("ERROR: Unsupported SPI framesize: %d\n", framesize);
++              spiinfo("Add framesize to this and below switch to use it. \n");
+                       break;
+               }
+             }
+@@ -1577,9 +1589,20 @@ static void s32k1xx_lpspi_exchange_nodma(struct spi_dev_s *dev,
+                    dest[4] =  rword1      & 0xff;
+                    dest += 5;
+                    break;
++              case 48:
++                   dest[0] = (word >> 24) & 0xff;
++                   dest[1] = (word >> 16) & 0xff;
++                   dest[2] = (word >>  8) & 0xff;
++                   dest[3] =  word        & 0xff;
++                   dest[4] = (rword1 >> 8) & 0xff;
++                   dest[5] = (rword1 >> 0) & 0xff;
++                   dest += 6;
++                   break;
+ #endif
+ 
+               default:
++              spierr("ERROR: Unsupported SPI framesize: %d\n", framesize);
++              spiinfo("Add framesize to this and below switch to use it. \n");
+ 
+                       break;
+             }
+diff --git a/arch/arm/src/s32k1xx/s32k1xx_serial.c b/arch/arm/src/s32k1xx/s32k1xx_serial.c
+index 513a6431cf..718a17cc3e 100644
+--- a/arch/arm/src/s32k1xx/s32k1xx_serial.c
++++ b/arch/arm/src/s32k1xx/s32k1xx_serial.c
+@@ -18,6 +18,8 @@
+  *
+  ****************************************************************************/
+ 
++/* Copyright 2025 NXP */
++
+ /****************************************************************************
+  * Included Files
+  ****************************************************************************/
+@@ -1671,7 +1673,7 @@ static void s32k1xx_dma_reenable(struct s32k1xx_uart_s *priv)
+ 
+   /* Clear DMA suspended flag. */
+ 
+-  priv->rxdmasusp  = false;
++  /* priv->rxdmasusp  = false; DMA suspend not supported */
+ }
+ #endif
+ 
+diff --git a/boards/Kconfig b/boards/Kconfig
+index 22302dd4d7..0ad60e3849 100644
+--- a/boards/Kconfig
++++ b/boards/Kconfig
+@@ -1603,6 +1603,14 @@ config ARCH_BOARD_RDDRONE_BMS772
+ 		This options selects support for NuttX on the NXP RDDRONE-BMS772
+ 		board featuring the S32K144 Cortex-M4F.
+ 
++config ARCH_BOARD_MR_BMS771
++	bool "NXP MR-BMS771"
++	depends on ARCH_CHIP_S32K146
++	select ARCH_HAVE_LEDS
++	---help---
++		This options selects support for NuttX on the NXP MR-BMS771
++		board featuring the S32K146 Cortex-M4F.
++
+ config ARCH_BOARD_S32K146EVB
+ 	bool "NXP S32K146EVB"
+ 	depends on ARCH_CHIP_S32K146
+@@ -2717,6 +2725,7 @@ config ARCH_BOARD
+ 	default "s32k118evb"               if ARCH_BOARD_S32K118EVB
+ 	default "s32k144evb"               if ARCH_BOARD_S32K144EVB
+ 	default "rddrone-bms772"           if ARCH_BOARD_RDDRONE_BMS772
++	default "mr-bms771"                if ARCH_BOARD_MR_BMS771
+ 	default "s32k146evb"               if ARCH_BOARD_S32K146EVB
+ 	default "ucans32k146"              if ARCH_BOARD_UCANS32K146
+ 	default "s32k148evb"               if ARCH_BOARD_S32K148EVB
+@@ -2891,6 +2900,9 @@ endif
+ if ARCH_BOARD_RDDRONE_BMS772
+ source "boards/arm/s32k1xx/rddrone-bms772/Kconfig"
+ endif
++if ARCH_BOARD_MR_BMS771
++source "boards/arm/s32k1xx/mr-bms771/Kconfig"
++endif
+ if ARCH_BOARD_S32K146EVB
+ source "boards/arm/s32k1xx/s32k146evb/Kconfig"
+ endif
+diff --git a/boards/arm/s32k1xx/mr-bms771/Kconfig b/boards/arm/s32k1xx/mr-bms771/Kconfig
+new file mode 100644
+index 0000000000..5443173a8b
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/Kconfig
+@@ -0,0 +1,27 @@
++#
++# For a description of the syntax of this configuration file,
++# see the file kconfig-language.txt in the NuttX tools repository.
++#
++
++if ARCH_BOARD_MR_BMS771
++
++config S32K1XX_NRSTCHECK_PROCFS
++	bool "MR-BMS771 nRST Check PROCFS entry"
++	default n
++	depends on FS_PROCFS
++	select FS_PROCFS_REGISTER
++	---help---
++		Self-test to check that the MCU reset pin is connected to an
++		external pull-up resistor (or an IC that pulls the pin high).
++		The input logic level is registered as a PROCFS entry.
++
++config SMBUS_SBD
++	bool "SMBus Smart Battery Data slave"
++	default n
++	depends on I2C_SLAVE
++	---help---
++		Simple SMBus/I2C slave providing battery management data,
++		specifically implementing a subset of the Smart Battery Data
++		Specification, Revision 1.1
++
++endif # ARCH_BOARD_MR_BMS771
+diff --git a/boards/arm/s32k1xx/mr-bms771/README.txt b/boards/arm/s32k1xx/mr-bms771/README.txt
+new file mode 100644
+index 0000000000..54bb83e614
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/README.txt
+@@ -0,0 +1,142 @@
++README
++======
++
++This directory holds the port to the NXP MR-BMS771 board with S32K146
++MCU.
++
++A NuttX compatible smart battery application for MR-BMS771 is also
++available. It contains additional drivers and example software to use
++most features of the battery management system.
++
++This application is currently published in a separate repository, but
++(parts) may eventually be upstreamed to Apache NuttX: 
++https://github.com/NXPHoverGames/MR-BMS771
++
++
++Contents
++========
++
++  o Status
++  o Serial Console
++  o LEDs
++  o Thread-Aware Debugging with Eclipse
++  o Configurations
++
++Status
++======
++
++  2020-11-02:  Configuration first published in separate GitHub repository.
++    Tested with the aforementioned BMS application.
++
++  2022-05-25:  Basic board configuration prepared for upstreaming to Apache NuttX.
++
++Serial Console
++==============
++
++  By default, the serial console will be provided on the DCD-LZ UART
++  (available on the 7-pin DCD-LZ debug connector J19):
++
++    DCD-LZ UART RX  PTC6  (LPUART1_RX)
++    DCD-LZ UART TX  PTC7  (LPUART1_TX)
++
++LEDs and Buttons
++================
++
++  LEDs
++  ----
++  The MR-BMS771 has one RGB LED:
++
++    RedLED    PTD16  (FTM0 CH1)
++    GreenLED  PTB13  (FTM0 CH1)
++    BlueLED   PTD15  (FTM0 CH0)
++
++  An output of '0' illuminates the LED.
++
++  If CONFIG_ARCH_LEDS is not defined, then the user can control the LEDs in
++  any way.  The following definitions are used to access individual RGB
++  components (see mr-bms771.h):
++
++    GPIO_LED_R
++    GPIO_LED_G
++    GPIO_LED_B
++
++  The RGB components could, alternatively, be controlled through PWM using
++  the common RGB LED driver.
++
++  If CONFIG_ARCH_LEDs is defined, then NuttX will control the LEDs on board
++  the MR-BMS771.  The following definitions describe how NuttX controls
++  the LEDs:
++
++    ==========================================+========+========+=========
++                                                 RED     GREEN     BLUE
++    ==========================================+========+========+=========
++
++    LED_STARTED      NuttX has been started      OFF      OFF      OFF
++    LED_HEAPALLOCATE Heap has been allocated     OFF      OFF      ON
++    LED_IRQSENABLED  Interrupts enabled          OFF      OFF      ON
++    LED_STACKCREATED Idle stack created          OFF      ON       OFF
++    LED_INIRQ        In an interrupt                   (no change)
++    LED_SIGNAL       In a signal handler               (no change)
++    LED_ASSERTION    An assertion failed               (no change)
++    LED_PANIC        The system has crashed      FLASH    OFF      OFF
++    LED_IDLE         S32K146 in sleep mode             (no change)
++    ==========================================+========+========+=========
++
++Thread-Aware Debugging with Eclipse
++===================================
++
++  Thread-aware debugging is possible with openocd-nuttx
++  ( https://github.com/sony/openocd-nuttx ) and was tested together with the
++  Eclipse-based S32 Design Studio for Arm:  
++  https://www.nxp.com/design/software/development-software/s32-design-studio-ide/s32-design-studio-for-arm:S32DS-ARM
++
++  NOTE: This method was last tested with NuttX 8.2 and S32DS for Arm 2018.R1.
++  It may not work anymore with recent releases of NuttX and/or S32DS.
++
++  1. NuttX should be build with debug symbols enabled.
++
++  2. Build OpenOCD as described here (using the same parameters as well):
++     https://micro.ros.org/docs/tutorials/old/debugging/
++
++  3. A s32k146.cfg file is available in the scripts/ folder.  Start OpenOCD
++     with the following command (adapt the path info):
++     /usr/local/bin/openocd -f /usr/share/openocd/scripts/interface/jlink.cfg \
++     -f boards/s32k1xx/mr-bms771/scripts/s32k146.cfg -c init -c "reset halt"
++
++  4. Setup a GDB debug session in Eclipse.  The resulting debug window shows
++     the NuttX threads.  The full stack details can be viewed.
++
++Configurations
++==============
++
++  Common Information
++  ------------------
++  Each MR-BMS771 configuration is maintained in a sub-directory and can be
++  selected as follows:
++
++    tools/configure.sh mr-bms771:<subdir>
++
++  Where <subdir> is one of the sub-directories listed in the next paragraph.
++
++    NOTES (common for all configurations):
++
++    1. This configuration uses the mconf-based configuration tool.  To change
++       this configuration using that tool, you should:
++
++       a. Build and install the kconfig-mconf tool.  See nuttx/README.txt.
++          Also see additional README.txt files in the NuttX tools repository.
++
++       b. Execute 'make menuconfig' in nuttx/ in order to start the
++          reconfiguration process.
++
++    2. Unless otherwise stated, the serial console used is LPUART1 at
++       115,200 8N1.  This corresponds to the OpenSDA VCOM port.
++
++  Configuration Sub-directories
++  -----------------------------
++
++    nsh:
++    ---
++      Configures the NuttShell (nsh) located at apps/examples/nsh.  Support
++      for builtin applications is enabled, but in the base configuration the
++      only application selected is the "Hello, World!" example.
+diff --git a/boards/arm/s32k1xx/mr-bms771/configs/bms/defconfig b/boards/arm/s32k1xx/mr-bms771/configs/bms/defconfig
+new file mode 100644
+index 0000000000..6cdf0d5818
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/configs/bms/defconfig
+@@ -0,0 +1,142 @@
++#
++# This file is autogenerated: PLEASE DO NOT EDIT IT.
++#
++# You can use "make menuconfig" to make any modifications to the installed .config file.
++# You can then do "make savedefconfig" to generate a new defconfig file that includes your
++# modifications.
++#
++# CONFIG_ARCH_LEDS is not set
++# CONFIG_NET_ETHERNET is not set
++# CONFIG_NET_IPv4 is not set
++# CONFIG_NSH_ARGCAT is not set
++# CONFIG_NSH_CMDOPT_HEXDUMP is not set
++# CONFIG_NSH_CMDPARMS is not set
++CONFIG_ALLOW_MIT_COMPONENTS=y
++CONFIG_ARCH="arm"
++CONFIG_ARCH_BOARD="mr-bms771"
++CONFIG_ARCH_BOARD_MR_BMS771=y
++CONFIG_ARCH_CHIP="s32k1xx"
++CONFIG_ARCH_CHIP_S32K146=y
++CONFIG_ARCH_CHIP_S32K14X=y
++CONFIG_ARCH_CHIP_S32K1XX=y
++CONFIG_ARCH_INTERRUPTSTACK=1024
++CONFIG_ARCH_STACKDUMP=y
++CONFIG_ARMV7M_LIBM=y
++CONFIG_ARMV7M_MEMCPY=y
++CONFIG_BCH=y
++CONFIG_BINFMT_DISABLE=y
++CONFIG_BOARDCTL_RESET=y
++CONFIG_BOARDCTL_UNIQUEID=y
++CONFIG_BOARD_LOOPSPERMSEC=6667
++CONFIG_BUILTIN=y
++CONFIG_CANUTILS_LIBCANARDV1=y
++CONFIG_CANUTILS_LIBDRONECAN=y
++CONFIG_CAN_CONNS=1
++CONFIG_DEBUG_SYMBOLS=y
++CONFIG_DEV_GPIO=y
++CONFIG_DRIVERS_VIDEO=y
++CONFIG_EVENT_FD=y
++CONFIG_FS_PROCFS=y
++CONFIG_FS_ROMFS=y
++CONFIG_I2C_DRIVER=y
++CONFIG_I2C_RESET=y
++CONFIG_I2C_SLAVE=y
++CONFIG_INIT_ENTRYPOINT="nsh_main"
++CONFIG_INIT_STACKSIZE=2304
++CONFIG_IOB_BUFSIZE=96
++CONFIG_LCD=y
++CONFIG_LCD_FRAMEBUFFER=y
++CONFIG_LCD_MAXCONTRAST=255
++CONFIG_LCD_RLANDSCAPE=y
++CONFIG_LCD_SSD1306_CUSTOM=y
++CONFIG_LCD_SSD1306_I2C=y
++CONFIG_LIBDRONECAN_VERSION="21f2a73df86886101e254d02cfc2277cd2a15717"
++CONFIG_LIBM=y
++CONFIG_LPI2C0_SLAVE_BUS=y
++CONFIG_LPUART0_RXBUFSIZE=64
++CONFIG_LPUART0_TXBUFSIZE=64
++CONFIG_LPUART1_RXBUFSIZE=64
++CONFIG_LPUART1_SERIAL_CONSOLE=y
++CONFIG_LPUART1_TXBUFSIZE=64
++CONFIG_NET=y
++CONFIG_NETDEV_CAN_BITRATE_IOCTL=y
++CONFIG_NETDEV_CAN_FILTER_IOCTL=y
++CONFIG_NETDEV_IFINDEX=y
++CONFIG_NET_CAN=y
++CONFIG_NET_CAN_EXTID=y
++CONFIG_NET_CAN_NOTIFIER=y
++CONFIG_NET_CAN_RAW_FILTER_MAX=0
++CONFIG_NET_CAN_RAW_TX_DEADLINE=y
++CONFIG_NET_CAN_SOCK_OPTS=y
++CONFIG_NET_TIMESTAMP=y
++CONFIG_NSH_ARCHINIT=y
++CONFIG_NSH_ARCHROMFS=y
++CONFIG_NSH_BUILTIN_APPS=y
++CONFIG_NSH_FILEIOSIZE=512
++CONFIG_NSH_READLINE=y
++CONFIG_NSH_ROMFSETC=y
++CONFIG_NXFONTS=y
++CONFIG_NXFONTS_CHARBITS=8
++CONFIG_NXFONTS_DISABLE_16BPP=y
++CONFIG_NXFONTS_DISABLE_1BPP=y
++CONFIG_NXFONTS_DISABLE_24BPP=y
++CONFIG_NXFONTS_DISABLE_2BPP=y
++CONFIG_NXFONTS_DISABLE_32BPP=y
++CONFIG_NXFONTS_DISABLE_4BPP=y
++CONFIG_NXFONTS_DISABLE_8BPP=y
++CONFIG_NXFONT_X11_MISC_FIXED_5X8=y
++CONFIG_NXP_BMS=y
++CONFIG_PATH_MAX=128
++CONFIG_PM=y
++CONFIG_PM_CONSOLE_SLEEP=y
++CONFIG_PM_CONSOLE_STANDBY=y
++CONFIG_PM_SERIAL_SLEEP=y
++CONFIG_PM_SERIAL_STANDBY=y
++CONFIG_PM_SPI0_SLEEP=y
++CONFIG_PM_SPI0_STANDBY=y
++CONFIG_PM_SPI1_STANDBY=y
++CONFIG_PM_SPI_SLEEP=y
++CONFIG_PM_SPI_STANDBY=y
++CONFIG_PREALLOC_TIMERS=4
++CONFIG_RAM_SIZE=126976
++CONFIG_RAM_START=0x1fff0000
++CONFIG_RAW_BINARY=y
++CONFIG_RR_INTERVAL=200
++CONFIG_S32K1XX_EEEPROM=y
++CONFIG_S32K1XX_FLEXCAN0=y
++CONFIG_S32K1XX_GPIOIRQ=y
++CONFIG_S32K1XX_LPI2C0=y
++CONFIG_S32K1XX_LPSPI0=y
++CONFIG_S32K1XX_LPSPI1=y
++CONFIG_S32K1XX_LPSPI_DWORD=y
++CONFIG_S32K1XX_LPSPI_HWPCS=y
++CONFIG_S32K1XX_LPUART0=y
++CONFIG_S32K1XX_LPUART1=y
++CONFIG_S32K1XX_NRSTCHECK_PROCFS=y
++CONFIG_S32K1XX_PORTAINTS=y
++CONFIG_S32K1XX_PORTBINTS=y
++CONFIG_S32K1XX_PORTCINTS=y
++CONFIG_S32K1XX_PORTDINTS=y
++CONFIG_S32K1XX_PORTEINTS=y
++CONFIG_S32K1XX_RESETCAUSE_PROCFS=y
++CONFIG_S32K1XX_RTC=y
++CONFIG_SCHED_CPULOAD=y
++CONFIG_SCHED_LPWORK=y
++CONFIG_SCHED_LPWORKSTACKSIZE=1536
++CONFIG_SCHED_WAITPID=y
++CONFIG_SIG_DEFAULT=y
++CONFIG_SMBUS_SBD=y
++CONFIG_SPI_DRIVER=y
++CONFIG_SSD1306_POWEROFF_RECONFIGURE=y
++CONFIG_STACK_COLORATION=y
++CONFIG_START_DAY=27
++CONFIG_START_MONTH=1
++CONFIG_START_YEAR=2023
++CONFIG_STDIO_DISABLE_BUFFERING=y
++CONFIG_SYMTAB_ORDEREDBYNAME=y
++CONFIG_SYSLOG_CONSOLE=y
++CONFIG_SYSTEM_NSH=y
++CONFIG_USERLED=y
++CONFIG_USERLED_LOWER=y
++CONFIG_USERLED_LOWER_READSTATE=y
++CONFIG_VIDEO_FB=y
+diff --git a/boards/arm/s32k1xx/mr-bms771/configs/bmsdebug/defconfig b/boards/arm/s32k1xx/mr-bms771/configs/bmsdebug/defconfig
+new file mode 100644
+index 0000000000..862115949a
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/configs/bmsdebug/defconfig
+@@ -0,0 +1,150 @@
++#
++# This file is autogenerated: PLEASE DO NOT EDIT IT.
++#
++# You can use "make menuconfig" to make any modifications to the installed .config file.
++# You can then do "make savedefconfig" to generate a new defconfig file that includes your
++# modifications.
++#
++# CONFIG_ARCH_LEDS is not set
++# CONFIG_NDEBUG is not set
++# CONFIG_NET_ETHERNET is not set
++# CONFIG_NET_IPv4 is not set
++# CONFIG_NSH_ARGCAT is not set
++# CONFIG_NSH_CMDOPT_HEXDUMP is not set
++# CONFIG_NSH_CMDPARMS is not set
++CONFIG_ALLOW_MIT_COMPONENTS=y
++CONFIG_ARCH="arm"
++CONFIG_ARCH_BOARD="mr-bms771"
++CONFIG_ARCH_BOARD_MR_BMS771=y
++CONFIG_ARCH_CHIP="s32k1xx"
++CONFIG_ARCH_CHIP_S32K146=y
++CONFIG_ARCH_CHIP_S32K14X=y
++CONFIG_ARCH_CHIP_S32K1XX=y
++CONFIG_ARCH_INTERRUPTSTACK=1024
++CONFIG_ARCH_STACKDUMP=y
++CONFIG_ARMV7M_LIBM=y
++CONFIG_ARMV7M_MEMCPY=y
++CONFIG_BCH=y
++CONFIG_BINFMT_DISABLE=y
++CONFIG_BOARDCTL_RESET=y
++CONFIG_BOARDCTL_UNIQUEID=y
++CONFIG_BOARD_LOOPSPERMSEC=6667
++CONFIG_BUILTIN=y
++CONFIG_CANUTILS_LIBCANARDV1=y
++CONFIG_CANUTILS_LIBDRONECAN=y
++CONFIG_CAN_CONNS=1
++CONFIG_DEBUG_ASSERTIONS=y
++CONFIG_DEBUG_ERROR=y
++CONFIG_DEBUG_FEATURES=y
++CONFIG_DEBUG_INFO=y
++CONFIG_DEBUG_SYMBOLS=y
++CONFIG_DEBUG_TCBINFO=y
++CONFIG_DEBUG_WARN=y
++CONFIG_DEV_GPIO=y
++CONFIG_DRIVERS_VIDEO=y
++CONFIG_EVENT_FD=y
++CONFIG_FS_PROCFS=y
++CONFIG_FS_ROMFS=y
++CONFIG_I2C_DRIVER=y
++CONFIG_I2C_RESET=y
++CONFIG_I2C_SLAVE=y
++CONFIG_INIT_ENTRYPOINT="nsh_main"
++CONFIG_INIT_STACKSIZE=2304
++CONFIG_IOB_BUFSIZE=96
++CONFIG_LCD=y
++CONFIG_LCD_FRAMEBUFFER=y
++CONFIG_LCD_MAXCONTRAST=255
++CONFIG_LCD_RLANDSCAPE=y
++CONFIG_LCD_SSD1306_CUSTOM=y
++CONFIG_LCD_SSD1306_I2C=y
++CONFIG_LIBDRONECAN_VERSION="21f2a73df86886101e254d02cfc2277cd2a15717"
++CONFIG_LIBM=y
++CONFIG_LPI2C0_SLAVE_BUS=y
++CONFIG_LPUART0_RXBUFSIZE=64
++CONFIG_LPUART0_TXBUFSIZE=64
++CONFIG_LPUART1_RXBUFSIZE=64
++CONFIG_LPUART1_SERIAL_CONSOLE=y
++CONFIG_LPUART1_TXBUFSIZE=64
++CONFIG_NET=y
++CONFIG_NETDEV_CAN_BITRATE_IOCTL=y
++CONFIG_NETDEV_CAN_FILTER_IOCTL=y
++CONFIG_NETDEV_IFINDEX=y
++CONFIG_NET_CAN=y
++CONFIG_NET_CAN_EXTID=y
++CONFIG_NET_CAN_NOTIFIER=y
++CONFIG_NET_CAN_RAW_FILTER_MAX=0
++CONFIG_NET_CAN_RAW_TX_DEADLINE=y
++CONFIG_NET_CAN_SOCK_OPTS=y
++CONFIG_NET_TIMESTAMP=y
++CONFIG_NSH_ARCHINIT=y
++CONFIG_NSH_ARCHROMFS=y
++CONFIG_NSH_BUILTIN_APPS=y
++CONFIG_NSH_FILEIOSIZE=512
++CONFIG_NSH_READLINE=y
++CONFIG_NSH_ROMFSETC=y
++CONFIG_NXFONTS=y
++CONFIG_NXFONTS_CHARBITS=8
++CONFIG_NXFONTS_DISABLE_16BPP=y
++CONFIG_NXFONTS_DISABLE_1BPP=y
++CONFIG_NXFONTS_DISABLE_24BPP=y
++CONFIG_NXFONTS_DISABLE_2BPP=y
++CONFIG_NXFONTS_DISABLE_32BPP=y
++CONFIG_NXFONTS_DISABLE_4BPP=y
++CONFIG_NXFONTS_DISABLE_8BPP=y
++CONFIG_NXFONT_X11_MISC_FIXED_5X8=y
++CONFIG_NXP_BMS=y
++CONFIG_PATH_MAX=128
++CONFIG_PM=y
++CONFIG_PM_CONSOLE_SLEEP=y
++CONFIG_PM_CONSOLE_STANDBY=y
++CONFIG_PM_SERIAL_SLEEP=y
++CONFIG_PM_SERIAL_STANDBY=y
++CONFIG_PM_SPI0_SLEEP=y
++CONFIG_PM_SPI0_STANDBY=y
++CONFIG_PM_SPI1_STANDBY=y
++CONFIG_PM_SPI_SLEEP=y
++CONFIG_PM_SPI_STANDBY=y
++CONFIG_PREALLOC_TIMERS=4
++CONFIG_RAM_SIZE=126976
++CONFIG_RAM_START=0x1fff0000
++CONFIG_RAW_BINARY=y
++CONFIG_RR_INTERVAL=200
++CONFIG_S32K1XX_EEEPROM=y
++CONFIG_S32K1XX_FLEXCAN0=y
++CONFIG_S32K1XX_GPIOIRQ=y
++CONFIG_S32K1XX_LPI2C0=y
++CONFIG_S32K1XX_LPSPI0=y
++CONFIG_S32K1XX_LPSPI1=y
++CONFIG_S32K1XX_LPSPI_DWORD=y
++CONFIG_S32K1XX_LPSPI_HWPCS=y
++CONFIG_S32K1XX_LPUART0=y
++CONFIG_S32K1XX_LPUART1=y
++CONFIG_S32K1XX_NRSTCHECK_PROCFS=y
++CONFIG_S32K1XX_PORTAINTS=y
++CONFIG_S32K1XX_PORTBINTS=y
++CONFIG_S32K1XX_PORTCINTS=y
++CONFIG_S32K1XX_PORTDINTS=y
++CONFIG_S32K1XX_PORTEINTS=y
++CONFIG_S32K1XX_RESETCAUSE_PROCFS=y
++CONFIG_S32K1XX_RTC=y
++CONFIG_SCHED_BACKTRACE=y
++CONFIG_SCHED_CPULOAD=y
++CONFIG_SCHED_LPWORK=y
++CONFIG_SCHED_LPWORKSTACKSIZE=1536
++CONFIG_SCHED_WAITPID=y
++CONFIG_SIG_DEFAULT=y
++CONFIG_SMBUS_SBD=y
++CONFIG_SPI_DRIVER=y
++CONFIG_SSD1306_POWEROFF_RECONFIGURE=y
++CONFIG_STACK_COLORATION=y
++CONFIG_START_DAY=27
++CONFIG_START_MONTH=1
++CONFIG_START_YEAR=2023
++CONFIG_STDIO_DISABLE_BUFFERING=y
++CONFIG_SYMTAB_ORDEREDBYNAME=y
++CONFIG_SYSLOG_CONSOLE=y
++CONFIG_SYSTEM_NSH=y
++CONFIG_USERLED=y
++CONFIG_USERLED_LOWER=y
++CONFIG_USERLED_LOWER_READSTATE=y
++CONFIG_VIDEO_FB=y
+diff --git a/boards/arm/s32k1xx/mr-bms771/configs/bmstrace/defconfig b/boards/arm/s32k1xx/mr-bms771/configs/bmstrace/defconfig
+new file mode 100644
+index 0000000000..59e2047f10
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/configs/bmstrace/defconfig
+@@ -0,0 +1,159 @@
++#
++# This file is autogenerated: PLEASE DO NOT EDIT IT.
++#
++# You can use "make menuconfig" to make any modifications to the installed .config file.
++# You can then do "make savedefconfig" to generate a new defconfig file that includes your
++# modifications.
++#
++# CONFIG_ARCH_LEDS is not set
++# CONFIG_NET_ETHERNET is not set
++# CONFIG_NET_IPv4 is not set
++# CONFIG_NSH_ARGCAT is not set
++# CONFIG_NSH_CMDOPT_HEXDUMP is not set
++# CONFIG_NSH_CMDPARMS is not set
++CONFIG_ALLOW_MIT_COMPONENTS=y
++CONFIG_ARCH="arm"
++CONFIG_ARCH_BOARD="mr-bms771"
++CONFIG_ARCH_BOARD_MR_BMS771=y
++CONFIG_ARCH_CHIP="s32k1xx"
++CONFIG_ARCH_CHIP_S32K146=y
++CONFIG_ARCH_CHIP_S32K14X=y
++CONFIG_ARCH_CHIP_S32K1XX=y
++CONFIG_ARCH_INTERRUPTSTACK=1024
++CONFIG_ARCH_STACKDUMP=y
++CONFIG_ARMV7M_LIBM=y
++CONFIG_ARMV7M_MEMCPY=y
++CONFIG_BCH=y
++CONFIG_BINFMT_DISABLE=y
++CONFIG_BOARDCTL_RESET=y
++CONFIG_BOARDCTL_UNIQUEID=y
++CONFIG_BOARD_LOOPSPERMSEC=6667
++CONFIG_BUILTIN=y
++CONFIG_CANUTILS_LIBCANARDV1=y
++CONFIG_CANUTILS_LIBDRONECAN=y
++CONFIG_CAN_CONNS=1
++CONFIG_DEBUG_ASSERTIONS=y
++CONFIG_DEBUG_ERROR=y
++CONFIG_DEBUG_FEATURES=y
++CONFIG_DEBUG_SYMBOLS=y
++CONFIG_DEBUG_TCBINFO=y
++CONFIG_DEV_GPIO=y
++CONFIG_DRIVERS_VIDEO=y
++CONFIG_DRIVER_NOTE=y
++CONFIG_EVENT_FD=y
++CONFIG_FS_PROCFS=y
++CONFIG_FS_ROMFS=y
++CONFIG_I2C_DRIVER=y
++CONFIG_I2C_RESET=y
++CONFIG_I2C_SLAVE=y
++CONFIG_INIT_ENTRYPOINT="nsh_main"
++CONFIG_INIT_STACKSIZE=2304
++CONFIG_IOB_BUFSIZE=96
++CONFIG_LCD=y
++CONFIG_LCD_FRAMEBUFFER=y
++CONFIG_LCD_MAXCONTRAST=255
++CONFIG_LCD_RLANDSCAPE=y
++CONFIG_LCD_SSD1306_CUSTOM=y
++CONFIG_LCD_SSD1306_I2C=y
++CONFIG_LIBDRONECAN_VERSION="21f2a73df86886101e254d02cfc2277cd2a15717"
++CONFIG_LIBM=y
++CONFIG_LPI2C0_SLAVE_BUS=y
++CONFIG_LPUART0_RXBUFSIZE=64
++CONFIG_LPUART0_TXBUFSIZE=64
++CONFIG_LPUART1_RXBUFSIZE=64
++CONFIG_LPUART1_SERIAL_CONSOLE=y
++CONFIG_LPUART1_TXBUFSIZE=64
++CONFIG_NET=y
++CONFIG_NETDEV_CAN_BITRATE_IOCTL=y
++CONFIG_NETDEV_CAN_FILTER_IOCTL=y
++CONFIG_NETDEV_IFINDEX=y
++CONFIG_NET_CAN=y
++CONFIG_NET_CAN_EXTID=y
++CONFIG_NET_CAN_NOTIFIER=y
++CONFIG_NET_CAN_RAW_FILTER_MAX=0
++CONFIG_NET_CAN_RAW_TX_DEADLINE=y
++CONFIG_NET_CAN_SOCK_OPTS=y
++CONFIG_NET_TIMESTAMP=y
++CONFIG_NSH_ARCHINIT=y
++CONFIG_NSH_ARCHROMFS=y
++CONFIG_NSH_BUILTIN_APPS=y
++CONFIG_NSH_FILEIOSIZE=512
++CONFIG_NSH_READLINE=y
++CONFIG_NSH_ROMFSETC=y
++CONFIG_NXFONTS=y
++CONFIG_NXFONTS_CHARBITS=8
++CONFIG_NXFONTS_DISABLE_16BPP=y
++CONFIG_NXFONTS_DISABLE_1BPP=y
++CONFIG_NXFONTS_DISABLE_24BPP=y
++CONFIG_NXFONTS_DISABLE_2BPP=y
++CONFIG_NXFONTS_DISABLE_32BPP=y
++CONFIG_NXFONTS_DISABLE_4BPP=y
++CONFIG_NXFONTS_DISABLE_8BPP=y
++CONFIG_NXFONT_X11_MISC_FIXED_5X8=y
++CONFIG_NXP_BMS=y
++CONFIG_PATH_MAX=128
++CONFIG_PM=y
++CONFIG_PM_CONSOLE_SLEEP=y
++CONFIG_PM_CONSOLE_STANDBY=y
++CONFIG_PM_SERIAL_SLEEP=y
++CONFIG_PM_SERIAL_STANDBY=y
++CONFIG_PM_SPI0_SLEEP=y
++CONFIG_PM_SPI0_STANDBY=y
++CONFIG_PM_SPI1_STANDBY=y
++CONFIG_PM_SPI_SLEEP=y
++CONFIG_PM_SPI_STANDBY=y
++CONFIG_PREALLOC_TIMERS=4
++CONFIG_RAM_SIZE=126976
++CONFIG_RAM_START=0x1fff0000
++CONFIG_RAW_BINARY=y
++CONFIG_RR_INTERVAL=200
++CONFIG_S32K1XX_EEEPROM=y
++CONFIG_S32K1XX_FLEXCAN0=y
++CONFIG_S32K1XX_GPIOIRQ=y
++CONFIG_S32K1XX_LPI2C0=y
++CONFIG_S32K1XX_LPSPI0=y
++CONFIG_S32K1XX_LPSPI1=y
++CONFIG_S32K1XX_LPSPI_DWORD=y
++CONFIG_S32K1XX_LPSPI_HWPCS=y
++CONFIG_S32K1XX_LPUART0=y
++CONFIG_S32K1XX_LPUART1=y
++CONFIG_S32K1XX_NRSTCHECK_PROCFS=y
++CONFIG_S32K1XX_PORTAINTS=y
++CONFIG_S32K1XX_PORTBINTS=y
++CONFIG_S32K1XX_PORTCINTS=y
++CONFIG_S32K1XX_PORTDINTS=y
++CONFIG_S32K1XX_PORTEINTS=y
++CONFIG_S32K1XX_RESETCAUSE_PROCFS=y
++CONFIG_S32K1XX_RTC=y
++CONFIG_SCHED_BACKTRACE=y
++CONFIG_SCHED_CPULOAD=y
++CONFIG_SCHED_INSTRUMENTATION=y
++CONFIG_SCHED_INSTRUMENTATION_FILTER=y
++CONFIG_SCHED_INSTRUMENTATION_FILTER_DEFAULT_MODE=0x0B
++CONFIG_SCHED_INSTRUMENTATION_IRQHANDLER=y
++CONFIG_SCHED_INSTRUMENTATION_SWITCH=y
++CONFIG_SCHED_LPWORK=y
++CONFIG_SCHED_LPWORKSTACKSIZE=1536
++CONFIG_SCHED_WAITPID=y
++CONFIG_SEGGER_RTT_BUFFER_SIZE_DOWN=2048
++CONFIG_SEGGER_RTT_BUFFER_SIZE_UP=2048
++CONFIG_SEGGER_RTT_MAX_NUM_DOWN_BUFFERS=12
++CONFIG_SEGGER_RTT_MAX_NUM_UP_BUFFERS=12
++CONFIG_SEGGER_SYSVIEW=y
++CONFIG_SEGGER_SYSVIEW_RTT_BUFFER_SIZE=6144
++CONFIG_SIG_DEFAULT=y
++CONFIG_SMBUS_SBD=y
++CONFIG_SPI_DRIVER=y
++CONFIG_SSD1306_POWEROFF_RECONFIGURE=y
++CONFIG_STACK_COLORATION=y
++CONFIG_START_DAY=27
++CONFIG_START_MONTH=1
++CONFIG_START_YEAR=2023
++CONFIG_STDIO_DISABLE_BUFFERING=y
++CONFIG_SYMTAB_ORDEREDBYNAME=y
++CONFIG_SYSLOG_CONSOLE=y
++CONFIG_SYSTEM_NSH=y
++CONFIG_USERLED=y
++CONFIG_USERLED_LOWER=y
++CONFIG_USERLED_LOWER_READSTATE=y
++CONFIG_VIDEO_FB=y
+diff --git a/boards/arm/s32k1xx/mr-bms771/configs/nsh/defconfig b/boards/arm/s32k1xx/mr-bms771/configs/nsh/defconfig
+new file mode 100644
+index 0000000000..5423dcf849
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/configs/nsh/defconfig
+@@ -0,0 +1,43 @@
++#
++# This file is autogenerated: PLEASE DO NOT EDIT IT.
++#
++# You can use "make menuconfig" to make any modifications to the installed .config file.
++# You can then do "make savedefconfig" to generate a new defconfig file that includes your
++# modifications.
++#
++# CONFIG_ARCH_FPU is not set
++# CONFIG_NSH_ARGCAT is not set
++# CONFIG_NSH_CMDOPT_HEXDUMP is not set
++# CONFIG_NSH_CMDPARMS is not set
++CONFIG_ARCH="arm"
++CONFIG_ARCH_BOARD="mr-bms771"
++CONFIG_ARCH_BOARD_MR_BMS771=y
++CONFIG_ARCH_CHIP="s32k1xx"
++CONFIG_ARCH_CHIP_S32K146=y
++CONFIG_ARCH_CHIP_S32K14X=y
++CONFIG_ARCH_CHIP_S32K1XX=y
++CONFIG_ARCH_STACKDUMP=y
++CONFIG_BOARD_LOOPSPERMSEC=6667
++CONFIG_BUILTIN=y
++CONFIG_EXAMPLES_HELLO=y
++CONFIG_FS_PROCFS=y
++CONFIG_HAVE_CXX=y
++CONFIG_HAVE_CXXINITIALIZE=y
++CONFIG_INIT_ENTRYPOINT="nsh_main"
++CONFIG_LPUART1_SERIAL_CONSOLE=y
++CONFIG_NSH_ARCHINIT=y
++CONFIG_NSH_BUILTIN_APPS=y
++CONFIG_NSH_FILEIOSIZE=512
++CONFIG_NSH_READLINE=y
++CONFIG_PREALLOC_TIMERS=4
++CONFIG_RAM_SIZE=126976
++CONFIG_RAM_START=0x1fff0000
++CONFIG_RAW_BINARY=y
++CONFIG_RR_INTERVAL=200
++CONFIG_S32K1XX_LPUART1=y
++CONFIG_SCHED_WAITPID=y
++CONFIG_START_DAY=8
++CONFIG_START_MONTH=11
++CONFIG_START_YEAR=2022
++CONFIG_SYMTAB_ORDEREDBYNAME=y
++CONFIG_SYSTEM_NSH=y
+diff --git a/boards/arm/s32k1xx/mr-bms771/include/board.h b/boards/arm/s32k1xx/mr-bms771/include/board.h
+new file mode 100644
+index 0000000000..761b4eb1ca
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/include/board.h
+@@ -0,0 +1,156 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/include/board.h
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++#ifndef __BOARDS_ARM_S32K1XX_MR_BMS771_INCLUDE_BOARD_H
++#define __BOARDS_ARM_S32K1XX_MR_BMS771_INCLUDE_BOARD_H
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++/****************************************************************************
++ * Pre-processor Definitions
++ ****************************************************************************/
++
++/* Clocking *****************************************************************/
++
++/* The MR-BMS771 is fitted with a 32 MHz crystal */
++
++#define BOARD_XTAL_FREQUENCY                  32000000
++
++/* The S32K146 will run at 80 MHz in RUN mode */
++
++#define MR_BMS771_RUN_SYSCLK_FREQUENCY        80000000
++
++/* The S32K146 will run at 2 MHz in VLPR mode */
++
++#define MR_BMS771_VLPR_SYSCLK_FREQUENCY       2000000
++
++/* LED definitions **********************************************************/
++
++/* The MR-BMS771 has one RGB LED:
++ *
++ *   RedLED    PTD16  (FTM0 CH1)
++ *   GreenLED  PTB13  (FTM0 CH1)
++ *   BlueLED   PTD15  (FTM0 CH0)
++ *
++ * If CONFIG_ARCH_LEDS is not defined, then the user can control the LEDs in
++ * any way.  The following definitions are used to access individual RGB
++ * components.
++ *
++ * The RGB components could, alternatively be controlled through PWM using
++ * the common RGB LED driver.
++ */
++
++/* LED index values for use with board_userled() */
++
++#define BOARD_LED_R       0
++#define BOARD_LED_G       1
++#define BOARD_LED_B       2
++#define BOARD_NLEDS       3
++
++/* LED bits for use with board_userled_all() */
++
++#define BOARD_LED_R_BIT   (1 << BOARD_LED_R)
++#define BOARD_LED_G_BIT   (1 << BOARD_LED_G)
++#define BOARD_LED_B_BIT   (1 << BOARD_LED_B)
++
++/* If CONFIG_ARCH_LEDs is defined, then NuttX will control the LEDs on board
++ * the MR-BMS771.  The following definitions describe how NuttX controls
++ * the LEDs:
++ *
++ *      SYMBOL            Meaning                         LED state
++ *                                                        RED    GREEN  BLUE
++ *      ----------------  -----------------------------  -------------------
++ */
++
++#define LED_STARTED       1 /* NuttX has been started     OFF    OFF    OFF */
++#define LED_HEAPALLOCATE  2 /* Heap has been allocated    OFF    OFF    ON  */
++#define LED_IRQSENABLED   0 /* Interrupts enabled         OFF    OFF    ON  */
++#define LED_STACKCREATED  3 /* Idle stack created         OFF    ON     OFF */
++#define LED_INIRQ         0 /* In an interrupt           (No change)        */
++#define LED_SIGNAL        0 /* In a signal handler       (No change)        */
++#define LED_ASSERTION     0 /* An assertion failed       (No change)        */
++#define LED_PANIC         4 /* The system has crashed     FLASH  OFF    OFF */
++#undef  LED_IDLE            /* S32K146 is in sleep mode  (Not used)         */
++
++/* UART selections **********************************************************/
++
++/* By default, the serial console will be provided on the DCD-LZ UART
++ * (available on the 7-pin DCD-LZ debug connector J19):
++ *
++ *   DCD-LZ UART RX  PTC6  (LPUART1_RX)
++ *   DCD-LZ UART TX  PTC7  (LPUART1_TX)
++ */
++
++#define PIN_LPUART1_RX    PIN_LPUART1_RX_1   /* PTC6 */
++#define PIN_LPUART1_TX    PIN_LPUART1_TX_1   /* PTC7 */
++
++/* Header J21  (LPUART0) */
++
++#define PIN_LPUART0_RX    PIN_LPUART0_RX_1   /* PTB0 */
++#define PIN_LPUART0_TX    PIN_LPUART0_TX_1   /* PTB1 */
++
++/* SPI selections ***********************************************************/
++
++/* UJA1169ATK/F SBC SPI  (LPSPI0) */
++
++#define PIN_LPSPI0_SCK    PIN_LPSPI0_SCK_3   /* PTB2 */
++#define PIN_LPSPI0_MISO   PIN_LPSPI0_SIN_2   /* PTB3 */
++#define PIN_LPSPI0_MOSI   PIN_LPSPI0_SOUT_3  /* PTB4 */
++#define PIN_LPSPI0_PCS    PIN_LPSPI0_PCS0_3  /* PTB5 */
++
++/* MC33771C BCC SPI  (LPSPI1) */
++
++#define PIN_LPSPI1_SCK    PIN_LPSPI1_SCK_3   /* PTD0 */
++#define PIN_LPSPI1_MISO   PIN_LPSPI1_SIN_2   /* PTD1 */
++#define PIN_LPSPI1_MOSI   PIN_LPSPI1_SOUT_3  /* PTD2 */
++#define PIN_LPSPI1_PCS    PIN_LPSPI1_PCS0_2  /* PTD3 */
++
++/* I2C selections ***********************************************************/
++
++/* I2C Master Connector J23  (LPI2C0 Master) */
++
++#define PIN_LPI2C0_SDA    PIN_LPI2C0_SDA_2   /* PTA2 */
++#define PIN_LPI2C0_SCL    PIN_LPI2C0_SCL_2   /* PTA3 */
++
++/* I2C/SMBus Connector J18  (LPI2C0 Slave) */
++
++#define PIN_LPI2C0_SDAS   PIN_LPI2C0_SDAS_1  /* PTA1 */
++#define PIN_LPI2C0_SCLS   PIN_LPI2C0_SCLS_1  /* PTA0 */
++
++/* CAN selections ***********************************************************/
++
++/* UJA1169ATK/F SBC CAN  (CAN0) */
++
++#define PIN_CAN0_RX       PIN_CAN0_RX_4      /* PTE4 */
++#define PIN_CAN0_TX       PIN_CAN0_TX_4      /* PTE5 */
++
++/* TJA1463ATK SIC CAN    (CAN1) */
++
++#define PIN_CAN1_RX       PIN_CAN1_RX_1      /* PTA12 */
++#define PIN_CAN1_TX       PIN_CAN1_TX_1      /* PTA13 */
++#define PIN_CAN1_STB      (PIN_PTB12 | GPIO_OUTPUT)
++
++#endif  /* __BOARDS_ARM_S32K1XX_MR_BMS771_INCLUDE_BOARD_H */
+diff --git a/boards/arm/s32k1xx/mr-bms771/include/nsh_romfsimg.h b/boards/arm/s32k1xx/mr-bms771/include/nsh_romfsimg.h
+new file mode 100644
+index 0000000000..38a9ab91c0
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/include/nsh_romfsimg.h
+@@ -0,0 +1,90 @@
++#include <nuttx/compiler.h>
++const unsigned char aligned_data(4) romfs_img[] = {
++  0x2d, 0x72, 0x6f, 0x6d, 0x31, 0x66, 0x73, 0x2d, 0x00, 0x00, 0x02, 0xd0,
++  0x61, 0xcb, 0xab, 0x51, 0x4e, 0x53, 0x48, 0x49, 0x6e, 0x69, 0x74, 0x56,
++  0x6f, 0x6c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x49,
++  0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0xd1, 0xff, 0xff, 0x97,
++  0x2e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x00, 0x00, 0x20,
++  0x00, 0x00, 0x00, 0x00, 0xd1, 0xd1, 0xff, 0x80, 0x2e, 0x2e, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00,
++  0x68, 0x2d, 0x96, 0x03, 0x69, 0x6e, 0x69, 0x74, 0x2e, 0x64, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x7a,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc9, 0x8d, 0x9c, 0xaa, 0xbd,
++  0x72, 0x63, 0x53, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x23, 0x20, 0x49, 0x6e, 0x69, 0x74, 0x69, 0x61,
++  0x6c, 0x69, 0x7a, 0x65, 0x20, 0x74, 0x68, 0x65, 0x20, 0x4d, 0x52, 0x2d,
++  0x42, 0x4d, 0x53, 0x37, 0x37, 0x31, 0x20, 0x42, 0x4d, 0x53, 0x20, 0x61,
++  0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x0a, 0x65,
++  0x63, 0x68, 0x6f, 0x20, 0x22, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62,
++  0x6c, 0x65, 0x20, 0x6d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x20, 0x61, 0x66,
++  0x74, 0x65, 0x72, 0x20, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x20, 0x69, 0x6e,
++  0x69, 0x74, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e,
++  0x3a, 0x22, 0x0a, 0x22, 0x66, 0x72, 0x65, 0x65, 0x22, 0x0a, 0x23, 0x20,
++  0x65, 0x63, 0x68, 0x6f, 0x20, 0x22, 0x42, 0x72, 0x69, 0x6e, 0x67, 0x20,
++  0x75, 0x70, 0x20, 0x63, 0x61, 0x6e, 0x30, 0x20, 0x69, 0x6e, 0x74, 0x65,
++  0x72, 0x66, 0x61, 0x63, 0x65, 0x3a, 0x22, 0x0a, 0x23, 0x20, 0x22, 0x69,
++  0x66, 0x75, 0x70, 0x22, 0x20, 0x22, 0x63, 0x61, 0x6e, 0x30, 0x22, 0x0a,
++  0x65, 0x63, 0x68, 0x6f, 0x20, 0x22, 0x4d, 0x52, 0x2d, 0x42, 0x4d, 0x53,
++  0x37, 0x37, 0x31, 0x3a, 0x20, 0x53, 0x74, 0x61, 0x72, 0x74, 0x69, 0x6e,
++  0x67, 0x20, 0x42, 0x4d, 0x53, 0x20, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63,
++  0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x0a, 0x22, 0x62, 0x6d, 0x73, 0x22,
++  0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x9a,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf1, 0xaa, 0xb5, 0x64, 0x94,
++  0x72, 0x63, 0x2e, 0x73, 0x79, 0x73, 0x69, 0x6e, 0x69, 0x74, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x23, 0x20, 0x49, 0x6e, 0x69, 0x74, 0x69, 0x61,
++  0x6c, 0x69, 0x7a, 0x65, 0x20, 0x74, 0x68, 0x65, 0x20, 0x4d, 0x52, 0x2d,
++  0x42, 0x4d, 0x53, 0x37, 0x37, 0x31, 0x20, 0x42, 0x4d, 0x53, 0x20, 0x61,
++  0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x0a, 0x65,
++  0x63, 0x68, 0x6f, 0x20, 0x22, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62,
++  0x6c, 0x65, 0x20, 0x6d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x20, 0x61, 0x66,
++  0x74, 0x65, 0x72, 0x20, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x20, 0x69, 0x6e,
++  0x69, 0x74, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e,
++  0x3a, 0x22, 0x0a, 0x22, 0x66, 0x72, 0x65, 0x65, 0x22, 0x0a, 0x23, 0x20,
++  0x65, 0x63, 0x68, 0x6f, 0x20, 0x22, 0x4e, 0x4f, 0x54, 0x20, 0x62, 0x72,
++  0x69, 0x6e, 0x67, 0x69, 0x6e, 0x67, 0x20, 0x75, 0x70, 0x20, 0x63, 0x61,
++  0x6e, 0x30, 0x20, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x66, 0x61, 0x63, 0x65,
++  0x22, 0x0a, 0x23, 0x20, 0x65, 0x63, 0x68, 0x6f, 0x20, 0x22, 0x42, 0x72,
++  0x69, 0x6e, 0x67, 0x20, 0x75, 0x70, 0x20, 0x63, 0x61, 0x6e, 0x30, 0x20,
++  0x69, 0x6e, 0x74, 0x65, 0x72, 0x66, 0x61, 0x63, 0x65, 0x3a, 0x22, 0x0a,
++  0x23, 0x20, 0x22, 0x69, 0x66, 0x75, 0x70, 0x22, 0x20, 0x22, 0x63, 0x61,
++  0x6e, 0x30, 0x22, 0x0a, 0x65, 0x63, 0x68, 0x6f, 0x20, 0x22, 0x4d, 0x52,
++  0x2d, 0x42, 0x4d, 0x53, 0x37, 0x37, 0x31, 0x3a, 0x20, 0x53, 0x74, 0x61,
++  0x72, 0x74, 0x69, 0x6e, 0x67, 0x20, 0x42, 0x4d, 0x53, 0x20, 0x61, 0x70,
++  0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x0a, 0x22,
++  0x62, 0x6d, 0x73, 0x22, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xb0,
++  0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0xd1, 0xd1, 0xfd, 0x30,
++  0x2e, 0x2e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60,
++  0x00, 0x00, 0x00, 0x00, 0xd1, 0xff, 0xff, 0xa0, 0x2e, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00
++};
++unsigned int romfs_img_len = 1024;
+diff --git a/boards/arm/s32k1xx/mr-bms771/include/rc.sysinit.template b/boards/arm/s32k1xx/mr-bms771/include/rc.sysinit.template
+new file mode 100644
+index 0000000000..031ccacc96
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/include/rc.sysinit.template
+@@ -0,0 +1,8 @@
++# Initialize the MR-BMS771 BMS application
++echo "Available memory after board initialization:"
++"free"
++# echo "NOT bringing up can0 interface"
++# echo "Bring up can0 interface:"
++# "ifup" "can0"
++echo "MR-BMS771: Starting BMS application"
++"bms"
+diff --git a/boards/arm/s32k1xx/mr-bms771/include/rcS.template b/boards/arm/s32k1xx/mr-bms771/include/rcS.template
+new file mode 100644
+index 0000000000..843cb9f9ee
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/include/rcS.template
+@@ -0,0 +1,7 @@
++# Initialize the MR-BMS771 BMS application
++echo "Available memory after board initialization:"
++"free"
++# echo "Bring up can0 interface:"
++# "ifup" "can0"
++echo "MR-BMS771: Starting BMS application"
++"bms"
+diff --git a/boards/arm/s32k1xx/mr-bms771/include/smbus_sbd.h b/boards/arm/s32k1xx/mr-bms771/include/smbus_sbd.h
+new file mode 100644
+index 0000000000..31ca7bf021
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/include/smbus_sbd.h
+@@ -0,0 +1,201 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/include/smbus_sbd.h
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++#ifndef __BOARDS_ARM_S32K1XX_MR_BMS771_INCLUDE_SMBUS_SBD_H
++#define __BOARDS_ARM_S32K1XX_MR_BMS771_INCLUDE_SMBUS_SBD_H
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++#include <sys/types.h>
++#include <stdint.h>
++
++#ifdef CONFIG_SMBUS_SBD
++
++/****************************************************************************
++ * Pre-processor Definitions
++ ****************************************************************************/
++
++/* Smart Battery Data Specification v1.1 registers **************************/
++
++/* 0x00-0x07 NOT YET IMPLEMENTED! */
++
++#if 0
++#define SBD_MANUFACTURER_ACCESS       0x00
++#define SBD_REMAINING_CAPACITY_ALARM  0x01
++#define SBD_REMAINING_TIME_ALARM      0x02
++#define SBD_BATTERY_MODE              0x03
++#define SBD_AT_RATE                   0x04
++#define SBD_AT_RATE_TIME_TO_FULL      0x05
++#define SBD_AT_RATE_TIME_TO_EMPTY     0x06
++#define SBD_AT_RATE_OK                0x07
++#endif
++
++#define SBD_TEMPERATURE               0x08
++#define SBD_VOLTAGE                   0x09
++#define SBD_CURRENT                   0x0a
++#define SBD_AVERAGE_CURRENT           0x0b
++#define SBD_MAX_ERROR                 0x0c
++#define SBD_RELATIVE_STATE_OF_CHARGE  0x0d
++#define SBD_ABSOLUTE_STATE_OF_CHARGE  0x0e
++#define SBD_REMAINING_CAPACITY        0x0f
++#define SBD_FULL_CHARGE_CAPACITY      0x10
++#define SBD_RUN_TIME_TO_EMPTY         0x11
++#define SBD_AVERAGE_TIME_TO_EMPTY     0x12
++
++/* 0x13-0x16 NOT YET IMPLEMENTED! */
++
++#if 0
++#define SBD_AVERAGE_TIME_TO_FULL      0x13
++#define SBD_CHARGING_CURRENT          0x14
++#define SBD_CHARGING_VOLTAGE          0x15
++#define SBD_BATTERY_STATUS            0x16
++#endif
++
++#define SBD_CYCLE_COUNT               0x17
++#define SBD_DESIGN_CAPACITY           0x18
++#define SBD_DESIGN_VOLTAGE            0x19
++
++/* 0x1a NOT YET IMPLEMENTED! */
++
++#if 0
++#define SBD_SPECIFICATION_INFO        0x1a
++#endif
++
++#define SBD_MANUFACTURE_DATE          0x1b
++#define SBD_SERIAL_NUMBER             0x1c
++#define SBD_MANUFACTURER_NAME         0x20
++#define SBD_DEVICE_NAME               0x21
++#define SBD_DEVICE_CHEMISTRY          0x22
++#define SBD_MANUFACTURER_DATA         0x23
++
++/* Non-standard registers ***************************************************/
++#define SBD_CELL14_VOLTAGE            0x32
++#define SBD_CELL13_VOLTAGE            0x33
++#define SBD_CELL12_VOLTAGE            0x34
++#define SBD_CELL11_VOLTAGE            0x35
++#define SBD_CELL10_VOLTAGE            0x36
++#define SBD_CELL9_VOLTAGE             0x37
++#define SBD_CELL8_VOLTAGE             0x38
++#define SBD_CELL7_VOLTAGE             0x39
++#define SBD_CELL6_VOLTAGE             0x3a
++#define SBD_CELL5_VOLTAGE             0x3b
++#define SBD_CELL4_VOLTAGE             0x3c
++#define SBD_CELL3_VOLTAGE             0x3d
++#define SBD_CELL2_VOLTAGE             0x3e
++#define SBD_CELL1_VOLTAGE             0x3f
++
++/****************************************************************************
++ * Public Type Definitions
++ ****************************************************************************/
++
++/* Battery data */
++
++struct smbus_sbd_data_s
++{
++  uint16_t temperature;              /* 0.1  K,       0 <->  6,553.5  K */
++  uint16_t voltage;                  /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t current;                  /* 1.0 mA, -32,767 <-> 32,767.0 mA */
++  uint16_t average_current;          /* 1.0 mA, -32,767 <-> 32,767.0 mA */
++  uint16_t max_error;                /* 1.0  %,       0 <->    100.0  % */
++  uint16_t relative_state_of_charge; /* 1.0  %,       0 <->    100.0  % */
++  uint16_t absolute_state_of_charge; /* 1.0  %,       0 <->    100.0  % */
++  uint16_t remaining_capacity;       /* 1.0 mAh,      0 <-> 65,535.0 mAh */
++  uint16_t full_charge_capacity;     /* 1.0 mAh,      0 <-> 65,535.0 mAh */
++  uint16_t run_time_to_empty;        /* 1.0 min,      0 <-> 65,535.0 min */
++  uint16_t average_time_to_empty;    /* 1.0 min,      0 <-> 65,535.0 min */
++
++  uint16_t cycle_count;              /* 1.0 cycle,    0 <-> 65,535.0 cycles */
++  uint16_t design_capacity;          /* 1.0 mAh,      0 <-> 65,535.0 mAh */
++  uint16_t design_voltage;           /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t manufacture_date;         /* (year-1980)*512 + month*32 + day */
++  uint16_t serial_number;
++  const char *manufacturer_name;
++  const char *device_name;
++  const char *device_chemistry;
++  const uint8_t *manufacturer_data;
++  uint8_t manufacturer_data_length;
++
++  uint16_t cell1_voltage;            /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell2_voltage;            /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell3_voltage;            /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell4_voltage;            /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell5_voltage;            /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell6_voltage;            /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell7_voltage;            /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell8_voltage;            /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell9_voltage;            /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell10_voltage;           /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell11_voltage;           /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell12_voltage;           /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell13_voltage;           /* 1.0 mV,       0 <-> 65,535.0 mV */
++  uint16_t cell14_voltage;           /* 1.0 mV,       0 <-> 65,535.0 mV */
++};
++
++/****************************************************************************
++ * Public Function Prototypes
++ ****************************************************************************/
++
++#undef EXTERN
++#if defined(__cplusplus)
++#define EXTERN extern "C"
++extern "C"
++{
++#else
++#define EXTERN extern
++#endif
++
++/****************************************************************************
++ * Name: smbus_sbd_initialize
++ *
++ * Description:
++ *   Create and register a SMBus Smart Battery Data character driver.
++ *
++ *   This SMBus Smart Battery Data slave character driver supports (a subset
++ *   of) the Smart Battery Data Specification, Revision 1.1.  This driver
++ *   provides a buffer to the I2C slave driver.  This buffer can be updated
++ *   at regular intervals by a user-space application.
++ *
++ * Input Parameters:
++ *   minor         - The SMBus Smart Battery Data slave character device will
++ *                   be registered as /dev/smbus-sbdN where N is the
++ *                   minor number
++ *   i2c_slave_dev - An instance of the lower half I2C slave driver
++ *
++ * Returned Value:
++ *   OK if the driver was successfully registered; A negated errno value is
++ *   returned on any failure.
++ *
++ ****************************************************************************/
++
++int smbus_sbd_initialize(int minor, struct i2c_slave_s *i2c_slave_dev);
++
++#undef EXTERN
++#if defined(__cplusplus)
++}
++#endif
++
++#endif /* CONFIG_SMBUS_SBD */
++#endif /* __BOARDS_ARM_S32K1XX_MR_BMS771_INCLUDE_SMBUS_SBD_H */
+diff --git a/boards/arm/s32k1xx/mr-bms771/scripts/Make.defs b/boards/arm/s32k1xx/mr-bms771/scripts/Make.defs
+new file mode 100644
+index 0000000000..99d43455d8
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/scripts/Make.defs
+@@ -0,0 +1,49 @@
++############################################################################
++# boards/arm/s32k1xx/mr-bms771/scripts/Make.defs
++#
++# Licensed to the Apache Software Foundation (ASF) under one or more
++# contributor license agreements.  See the NOTICE file distributed with
++# this work for additional information regarding copyright ownership.  The
++# ASF licenses this file to you under the Apache License, Version 2.0 (the
++# "License"); you may not use this file except in compliance with the
++# License.  You may obtain a copy of the License at
++#
++#   http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++# License for the specific language governing permissions and limitations
++# under the License.
++#
++############################################################################
++
++# Copyright 2022-2025 NXP
++
++include $(TOPDIR)/.config
++include $(TOPDIR)/tools/Config.mk
++include $(TOPDIR)/arch/arm/src/armv7-m/Toolchain.defs
++
++ifeq ($(CONFIG_BOOT_RUNFROMFLASH),y)
++ LDSCRIPT = flash.ld
++else ifeq ($(CONFIG_BOOT_RUNFROMISRAM),y)
++ LDSCRIPT = sram.ld
++endif
++
++$(warning, LDSCRIPT is $(LDSCRIPT))
++ARCHSCRIPT += $(BOARD_DIR)$(DELIM)scripts$(DELIM)$(LDSCRIPT)
++$(warning, LDSCRIPT is $(LDSCRIPT))
++$(warning, ARCHSCRIPT is $(ARCHSCRIPT))
++
++ARCHPICFLAGS = -fpic -msingle-pic-base -mpic-register=r10
++
++CFLAGS := $(ARCHCFLAGS) $(ARCHOPTIMIZATION) $(ARCHCPUFLAGS) $(ARCHINCLUDES) $(ARCHDEFINES) $(EXTRAFLAGS) -pipe
++CPICFLAGS = $(ARCHPICFLAGS) $(CFLAGS)
++CXXFLAGS := $(ARCHCXXFLAGS) $(ARCHOPTIMIZATION) $(ARCHCPUFLAGS) $(ARCHXXINCLUDES) $(ARCHDEFINES) $(EXTRAFLAGS) -pipe
++CXXPICFLAGS = $(ARCHPICFLAGS) $(CXXFLAGS)
++CPPFLAGS := $(ARCHINCLUDES) $(ARCHDEFINES) $(EXTRAFLAGS)
++AFLAGS := $(CFLAGS) -D__ASSEMBLY__
++
++NXFLATLDFLAGS1 = -r -d -warn-common
++NXFLATLDFLAGS2 = $(NXFLATLDFLAGS1) -T$(TOPDIR)/binfmt/libnxflat/gnu-nxflat-pcrel.ld -no-check-sections
++LDNXFLATFLAGS = -e main -s 2048
+diff --git a/boards/arm/s32k1xx/mr-bms771/scripts/flash.ld b/boards/arm/s32k1xx/mr-bms771/scripts/flash.ld
+new file mode 100644
+index 0000000000..a92149b51a
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/scripts/flash.ld
+@@ -0,0 +1,139 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/scripts/flash.ld
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/* The S32K146 has 1Mb of FLASH beginning at address 0x0000:0000 and
++ * 124Kb of SRAM beginning at address 0x1fff:0000 (plus 4Kb of FlexRAM)
++ *
++ * The on-chip RAM is split in two regions: SRAM_L and SRAM_U. The RAM is
++ * implemented such that the SRAM_L and SRAM_U ranges form a contiguous
++ * block in the memory map
++ *
++ *   SRAM_L 1fff0000 - 1fffffff 64Kb
++ *   SRAM_U 20000000 - 2000efff 60Kb
++ */
++
++MEMORY
++{
++  vflash (rx) : ORIGIN = 0x00000000, LENGTH = 1K
++  pflash (rx) : ORIGIN = 0x00000400, LENGTH = 16
++  dflash (rx) : ORIGIN = 0x00000410, LENGTH = 1023K-16
++  sram  (rwx) : ORIGIN = 0x1fff0000, LENGTH = 124K
++}
++
++OUTPUT_ARCH(arm)
++EXTERN(_vectors)
++EXTERN(g_flashcfg)
++ENTRY(_stext)
++
++SECTIONS
++{
++  .vectors :
++  {
++    _stext = ABSOLUTE(.);
++    *(.vectors)
++  } > vflash
++
++  .flashcfg :
++  {
++    *(.flashcfg)
++  } > pflash
++
++  .text :
++  {
++    *(.text .text.*)
++    *(.fixup)
++    *(.gnu.warning)
++    *(.rodata .rodata.*)
++    *(.gnu.linkonce.t.*)
++    *(.glue_7)
++    *(.glue_7t)
++    *(.got)
++    *(.gcc_except_table)
++    *(.gnu.linkonce.r.*)
++    _etext = ABSOLUTE(.);
++  } > dflash
++
++  .init_section :
++  {
++    _sinit = ABSOLUTE(.);
++    KEEP(*(.init_array .init_array.*))
++    _einit = ABSOLUTE(.);
++  } > dflash
++
++  .ARM.extab :
++  {
++    *(.ARM.extab*)
++  } >dflash
++
++  .ARM.exidx :
++  {
++    __exidx_start = ABSOLUTE(.);
++    *(.ARM.exidx*)
++    __exidx_end = ABSOLUTE(.);
++  } >dflash
++
++  .data :
++  {
++    _sdata = ABSOLUTE(.);
++    *(.data .data.*)
++    *(.gnu.linkonce.d.*)
++    CONSTRUCTORS
++    . = ALIGN(4);
++    _edata = ABSOLUTE(.);
++  } > sram AT > dflash
++
++  _eronly = LOADADDR(.data);
++
++  .ramfunc ALIGN(4):
++  {
++    _sramfuncs = ABSOLUTE(.);
++    *(.ramfunc  .ramfunc.*)
++    _eramfuncs = ABSOLUTE(.);
++  } > sram AT > dflash
++
++  _framfuncs = LOADADDR(.ramfunc);
++
++  .bss :
++  {
++    _sbss = ABSOLUTE(.);
++    *(.bss .bss.*)
++    *(.gnu.linkonce.b.*)
++    *(COMMON)
++    . = ALIGN(4);
++    _ebss = ABSOLUTE(.);
++  } > sram
++
++  /* Stabs debugging sections. */
++
++  .stab 0 : { *(.stab) }
++  .stabstr 0 : { *(.stabstr) }
++  .stab.excl 0 : { *(.stab.excl) }
++  .stab.exclstr 0 : { *(.stab.exclstr) }
++  .stab.index 0 : { *(.stab.index) }
++  .stab.indexstr 0 : { *(.stab.indexstr) }
++  .comment 0 : { *(.comment) }
++  .debug_abbrev 0 : { *(.debug_abbrev) }
++  .debug_info 0 : { *(.debug_info) }
++  .debug_line 0 : { *(.debug_line) }
++  .debug_pubnames 0 : { *(.debug_pubnames) }
++  .debug_aranges 0 : { *(.debug_aranges) }
++}
+diff --git a/boards/arm/s32k1xx/mr-bms771/scripts/mr-bms771.jlink b/boards/arm/s32k1xx/mr-bms771/scripts/mr-bms771.jlink
+new file mode 100644
+index 0000000000..81e0dc7323
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/scripts/mr-bms771.jlink
+@@ -0,0 +1,21 @@
++//
++// Copyright 2023-2025 NXP
++//
++// J-Link Command File for connecting to MR-BMS771 with a J-Link debugger and flashing a compiled NuttX binary.
++//
++// The script can be executed by entering the command: JLinkExe -CommandFile mr-bms771.jlink
++// Note that the current working directory needs to be /boards/arm/s32k1xx/mr-bms771/scripts/ 
++//
++
++usb
++si SWD
++speed 1000
++device S32K146
++connect
++r
++w1 0x40020007, 0x44 // Reset entire flash, including the area used for the Emulated EEPROM functionality,
++w1 0x40020000, 0x80 // which may be used to store application parameters.  Avoids issues when upgrading firmware.
++sleep 1000
++loadbin ../../../../../nuttx.bin, 0x00
++r
++qc
+diff --git a/boards/arm/s32k1xx/mr-bms771/scripts/s32k146.cfg b/boards/arm/s32k1xx/mr-bms771/scripts/s32k146.cfg
+new file mode 100644
+index 0000000000..d1a7e68388
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/scripts/s32k146.cfg
+@@ -0,0 +1,61 @@
++#
++# Copyright 2022-2025 NXP
++#
++# NXP S32K146 - 1x ARM Cortex-M4 @ up to 80/112 MHz
++#
++
++# May be increased to 4000 if the programmer allows
++adapter_khz 1000
++transport select swd
++
++if { [info exists CHIPNAME] } {
++	set _CHIPNAME $CHIPNAME
++} else {
++	set _CHIPNAME s32k146
++}
++
++#
++# M4 JTAG mode TAP
++#
++if { [info exists M4_JTAG_TAPID] } {
++	set _M4_JTAG_TAPID $M4_JTAG_TAPID
++} else {
++	set _M4_JTAG_TAPID 0x4ba00477
++}
++
++#
++# M4 SWD mode TAP
++#
++if { [info exists M4_SWD_TAPID] } {
++	set _M4_SWD_TAPID $M4_SWD_TAPID
++} else {
++	set _M4_SWD_TAPID 0x2ba01477
++}
++
++source [find target/swj-dp.tcl]
++
++if { [using_jtag] } {
++	set _M4_TAPID $_M4_JTAG_TAPID
++} else {
++	set _M4_TAPID $_M4_SWD_TAPID
++}
++
++swj_newdap $_CHIPNAME m4 -irlen 4 -ircapture 0x1 -irmask 0xf \
++				-expected-id $_M4_TAPID
++
++target create $_CHIPNAME.m4 cortex_m -chain-position $_CHIPNAME.m4
++
++# S32K146 has 64+60 KB contiguous SRAM
++if { [info exists WORKAREASIZE] } {
++	set _WORKAREASIZE $WORKAREASIZE
++} else {
++	set _WORKAREASIZE 0x1F000
++}
++$_CHIPNAME.m4 configure -work-area-phys 0x1FFF0000 \
++                        -work-area-size $_WORKAREASIZE -work-area-backup 0
++
++$_CHIPNAME.m4 configure -rtos nuttx
++
++if { ![using_hla] } {
++	cortex_m reset_config vectreset
++}
+diff --git a/boards/arm/s32k1xx/mr-bms771/scripts/sram.ld b/boards/arm/s32k1xx/mr-bms771/scripts/sram.ld
+new file mode 100644
+index 0000000000..e870a3b74d
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/scripts/sram.ld
+@@ -0,0 +1,116 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/scripts/sram.ld
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/* The S32K146 has 1Mb of FLASH beginning at address 0x0000:0000 and
++ * 124Kb of SRAM beginning at address 0x1fff:0000 (plus 4Kb of FlexRAM)
++ *
++ * The on-chip RAM is split in two regions: SRAM_L and SRAM_U. The RAM is
++ * implemented such that the SRAM_L and SRAM_U ranges form a contiguous
++ * block in the memory map
++ *
++ *   SRAM_L 1fff0000 - 1fffffff 64Kb
++ *   SRAM_U 20000000 - 2000efff 60Kb
++ */
++
++MEMORY
++{
++  flash (rx)  : ORIGIN = 0x00000000, LENGTH = 1M
++  sram  (rwx) : ORIGIN = 0x1fff0000, LENGTH = 124K
++}
++
++OUTPUT_ARCH(arm)
++EXTERN(_vectors)
++ENTRY(_stext)
++
++SECTIONS
++{
++  .text :
++  {
++    _stext = ABSOLUTE(.);
++    *(.vectors)
++    *(.text .text.*)
++    *(.fixup)
++    *(.gnu.warning)
++    *(.rodata .rodata.*)
++    *(.gnu.linkonce.t.*)
++    *(.glue_7)
++    *(.glue_7t)
++    *(.got)
++    *(.gcc_except_table)
++    *(.gnu.linkonce.r.*)
++    _etext = ABSOLUTE(.);
++  } > sram
++
++  .init_section :
++  {
++    _sinit = ABSOLUTE(.);
++    KEEP(*(.init_array .init_array.*))
++    _einit = ABSOLUTE(.);
++  } > sram
++
++  .ARM.extab :
++  {
++    *(.ARM.extab*)
++  } >sram
++
++  .ARM.exidx :
++  {
++    __exidx_start = ABSOLUTE(.);
++    *(.ARM.exidx*)
++    __exidx_end = ABSOLUTE(.);
++  } >sram
++
++  .data :
++  {
++    _sdata = ABSOLUTE(.);
++    *(.data .data.*)
++    *(.gnu.linkonce.d.*)
++    CONSTRUCTORS
++    . = ALIGN(4);
++    _edata = ABSOLUTE(.);
++  } > sram
++
++  .bss :
++  {
++    _sbss = ABSOLUTE(.);
++    *(.bss .bss.*)
++    *(.gnu.linkonce.b.*)
++    *(COMMON)
++    . = ALIGN(4);
++    _ebss = ABSOLUTE(.);
++  } > sram
++
++  /* Stabs debugging sections. */
++
++  .stab 0 : { *(.stab) }
++  .stabstr 0 : { *(.stabstr) }
++  .stab.excl 0 : { *(.stab.excl) }
++  .stab.exclstr 0 : { *(.stab.exclstr) }
++  .stab.index 0 : { *(.stab.index) }
++  .stab.indexstr 0 : { *(.stab.indexstr) }
++  .comment 0 : { *(.comment) }
++  .debug_abbrev 0 : { *(.debug_abbrev) }
++  .debug_info 0 : { *(.debug_info) }
++  .debug_line 0 : { *(.debug_line) }
++  .debug_pubnames 0 : { *(.debug_pubnames) }
++  .debug_aranges 0 : { *(.debug_aranges) }
++}
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/Makefile b/boards/arm/s32k1xx/mr-bms771/src/Makefile
+new file mode 100644
+index 0000000000..ee239a0c3e
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/Makefile
+@@ -0,0 +1,70 @@
++############################################################################
++# boards/arm/s32k1xx/mr-bms771/src/Makefile
++#
++# Licensed to the Apache Software Foundation (ASF) under one or more
++# contributor license agreements.  See the NOTICE file distributed with
++# this work for additional information regarding copyright ownership.  The
++# ASF licenses this file to you under the Apache License, Version 2.0 (the
++# "License"); you may not use this file except in compliance with the
++# License.  You may obtain a copy of the License at
++#
++#   http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++# License for the specific language governing permissions and limitations
++# under the License.
++#
++############################################################################
++
++# Copyright 2022-2025 NXP
++
++include $(TOPDIR)/Make.defs
++
++CSRCS  = s32k1xx_boot.c s32k1xx_bringup.c s32k1xx_clockconfig.c
++CSRCS += s32k1xx_periphclocks.c
++
++ifeq ($(CONFIG_ARCH_LEDS),y)
++CSRCS += s32k1xx_autoleds.c
++else
++CSRCS += s32k1xx_userleds.c
++endif
++
++ifeq ($(CONFIG_BOARDCTL),y)
++CSRCS += s32k1xx_appinit.c
++endif
++
++ifeq ($(CONFIG_BOARDCTL_RESET),y)
++CSRCS += s32k1xx_reset.c
++endif
++
++ifeq ($(CONFIG_BOARDCTL_UNIQUEID),y)
++CSRCS += s32k1xx_uid.c
++endif
++
++ifeq ($(CONFIG_DEV_GPIO),y)
++CSRCS += s32k1xx_gpio.c
++endif
++
++ifeq ($(CONFIG_S32K1XX_LPI2C),y)
++CSRCS += s32k1xx_i2c.c
++endif
++
++ifeq ($(CONFIG_LCD_SSD1306_I2C),y)
++CSRCS += s32k1xx_ssd1306.c
++endif
++
++ifeq ($(CONFIG_S32K1XX_LPSPI),y)
++CSRCS += s32k1xx_spi.c
++endif
++
++ifeq ($(CONFIG_S32K1XX_NRSTCHECK_PROCFS),y)
++CSRCS += s32k1xx_nrstcheck_procfs.c
++endif
++
++ifeq ($(CONFIG_SMBUS_SBD),y)
++CSRCS += s32k1xx_smbus_sbd.c
++endif
++
++include $(TOPDIR)/boards/Board.mk
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/mr-bms771.h b/boards/arm/s32k1xx/mr-bms771/src/mr-bms771.h
+new file mode 100644
+index 0000000000..5663ca7dbb
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/mr-bms771.h
+@@ -0,0 +1,162 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/mr-bms771.h
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++#ifndef __BOARDS_ARM_S32K1XX_MR_BMS771_SRC_MR_BMS771_H
++#define __BOARDS_ARM_S32K1XX_MR_BMS771_SRC_MR_BMS771_H
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++#include <nuttx/compiler.h>
++
++#include <stdint.h>
++
++#include "hardware/s32k1xx_pinmux.h"
++#include "s32k1xx_periphclocks.h"
++#include "s32k1xx_pin.h"
++
++/****************************************************************************
++ * Pre-processor Definitions
++ ****************************************************************************/
++
++/* Configuration ************************************************************/
++
++/* MR-BMS771 GPIOs *****************************************************/
++
++/* LEDs.  The MR-BMS771 has one RGB LED:
++ *
++ *   RedLED    PTD16  (FTM0 CH1)
++ *   GreenLED  PTB13  (FTM0 CH1)
++ *   BlueLED   PTD15  (FTM0 CH0)
++ *
++ * An output of '0' illuminates the LED.
++ */
++
++#define GPIO_LED_R  (PIN_PTD16 | GPIO_LOWDRIVE | GPIO_OUTPUT_ONE)
++#define GPIO_LED_G  (PIN_PTB13 | GPIO_LOWDRIVE | GPIO_OUTPUT_ONE)
++#define GPIO_LED_B  (PIN_PTD15 | GPIO_LOWDRIVE | GPIO_OUTPUT_ONE)
++
++/* GPIO pins to be registered to the GPIO driver.  These definitions need to
++ * be added to the g_gpiopins array in s32k1xx_gpio.c!
++ */
++
++#define GPIO0       (PIN_PTC1  | GPIO_OUTPUT) /* GATE_CTRL_CP */
++#define GPIO1       (PIN_PTC2  | GPIO_OUTPUT) /* GATE_CTRL_D */
++#define GPIO2       (PIN_PTD5  | GPIO_OUTPUT) /* BCC_RESET */
++#define GPIO3       (PIN_PTE10 | GPIO_OUTPUT) /* NFC_HPD */
++#define GPIO4       (PIN_PTC15 | GPIO_OUTPUT) /* SE_RST_N */
++#define GPIO5       (PIN_PTC17 | GPIO_OUTPUT) /* SE_EN */
++#define GPIO6       (PIN_PTE3  | GPIO_OUTPUT) /* LED_CAN0 */
++#define GPIO7       (PIN_PTC8  | GPIO_OUTPUT) /* LED_CAN1 */
++#define GPIO8       (PIN_PTD4  | GPIO_OUTPUT) /* 12V_EXT_ON */
++#define GPIO9       (PIN_PTA6  | GPIO_OUTPUT) /* CAN1_EN */
++#define GPIO10      (PIN_PTB12 | GPIO_OUTPUT) /* CAN1_STB_N */
++
++#define GPIO11      (PIN_PTE8  | GPIO_INPUT | PIN_INT_BOTH) /* PTE8_SW_E_STOP */
++#define GPIO12      (PIN_PTC3  | GPIO_INPUT | PIN_INT_BOTH) /* OVERCURRENT */
++#define GPIO13      (PIN_PTC14 | GPIO_INPUT | PIN_INT_BOTH) /* BUTTON_WAKE_N */
++#define GPIO14      (PIN_PTC0  | GPIO_INPUT | PIN_INT_BOTH) /* CAN1_ERR_N */
++#define GPIO15      (PIN_PTA11 | GPIO_INPUT | PIN_INT_BOTH) /* SBC_LIMP */
++#define GPIO16      (PIN_PTC9  | GPIO_INPUT | PIN_INT_BOTH) /* BCC_FAULT */
++#define GPIO17      (PIN_PTE11 | GPIO_INPUT | PIN_INT_BOTH) /* NFC_ED */
++#define GPIO18      (PIN_PTE7  | GPIO_INPUT | PIN_INT_BOTH) /* E_FUSE_FLAG_N */
++
++#define NUM_OF_GPIO 19
++
++/****************************************************************************
++ * Public Data
++ ****************************************************************************/
++
++#ifndef __ASSEMBLY__
++
++/* User peripheral configuration structure 0 */
++
++extern const struct peripheral_clock_config_s g_peripheral_clockconfig0[];
++
++/****************************************************************************
++ * Public Function Prototypes
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: s32k1xx_bringup
++ *
++ * Description:
++ *   Perform architecture-specific initialization
++ *
++ *   CONFIG_BOARD_LATE_INITIALIZE=y :
++ *     Called from board_late_initialize().
++ *
++ *   CONFIG_BOARD_LATE_INITIALIZE=y && CONFIG_BOARDCTL=y :
++ *     Called from the NSH library
++ *
++ ****************************************************************************/
++
++int s32k1xx_bringup(void);
++
++/****************************************************************************
++ * Name: s32k1xx_gpio_initialize
++ *
++ * Description:
++ *   Initialize GPIO drivers for use with /apps/examples/gpio
++ *
++ ****************************************************************************/
++
++int s32k1xx_gpio_initialize(void);
++
++/****************************************************************************
++ * Name: s32k1xx_i2cdev_initialize
++ *
++ * Description:
++ *   Initialize I2C driver and register /dev/i2cN devices.
++ *
++ ****************************************************************************/
++
++int s32k1xx_i2cdev_initialize(void);
++
++/****************************************************************************
++ * Name: s32k1xx_spidev_initialize
++ *
++ * Description:
++ *   Configure chip select pins, initialize the SPI driver and register
++ *   /dev/spiN devices.
++ *
++ ****************************************************************************/
++
++int s32k1xx_spidev_initialize(void);
++
++/****************************************************************************
++ * Name: s32k1xx_nrstcheck_procfs_register
++ *
++ * Description:
++ *   Check if the (active low) reset pin is being pulled high externally by
++ *   reconfiguring the pin (temporarily) to a GPIO input with weak pull-down.
++ *   The pin state is saved and registered as a PROCFS entry.  The pin will
++ *   then be reconfigured again as reset pin.
++ *
++ ****************************************************************************/
++
++int s32k1xx_nrstcheck_procfs_register(void);
++
++#endif /* __ASSEMBLY__ */
++#endif /* __BOARDS_ARM_S32K1XX_MR_BMS771_SRC_MR_BMS771_H */
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_appinit.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_appinit.c
+new file mode 100644
+index 0000000000..4f5184bb25
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_appinit.c
+@@ -0,0 +1,82 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_appinit.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++#include <nuttx/board.h>
++
++#include <stdint.h>
++
++#include "mr-bms771.h"
++
++/****************************************************************************
++ * Pre-processor Definitions
++ ****************************************************************************/
++
++#ifndef OK
++#  define OK 0
++#endif
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: board_app_initialize
++ *
++ * Description:
++ *   Perform application specific initialization.  This function is never
++ *   called directly from application code, but only indirectly via the
++ *   (non-standard) boardctl() interface using the command BOARDIOC_INIT.
++ *
++ * Input Parameters:
++ *   arg - The boardctl() argument is passed to the board_app_initialize()
++ *         implementation without modification.  The argument has no meaning
++ *         to NuttX; the meaning of the argument is a contract between the
++ *         board-specific initialization logic and the matching application
++ *         logic.  The value could be such things as a mode enumeration
++ *         value, a set of DIP switch settings, a pointer to configuration
++ *         data read from a file or serial FLASH, or whatever you would like
++ *         to do with it.  Every implementation should accept zero/NULL as a
++ *         default configuration.
++ *
++ * Returned Value:
++ *   Zero (OK) is returned on success; a negated errno value is returned on
++ *   any failure to indicate the nature of the failure.
++ *
++ ****************************************************************************/
++
++int board_app_initialize(uintptr_t arg)
++{
++#ifdef CONFIG_BOARD_LATE_INITIALIZE
++  /* Board initialization already performed by board_late_initialize() */
++
++  return OK;
++#else
++  /* Perform board-specific initialization */
++
++  return s32k1xx_bringup();
++#endif
++}
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_autoleds.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_autoleds.c
+new file mode 100644
+index 0000000000..e1f1159706
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_autoleds.c
+@@ -0,0 +1,150 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_autoleds.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/* The MR-BMS771 has one RGB LED:
++ *
++ *   RedLED    PTD16  (FTM0 CH1)
++ *   GreenLED  PTB13  (FTM0 CH1)
++ *   BlueLED   PTD15  (FTM0 CH0)
++ *
++ * An output of '0' illuminates the LED.
++ *
++ * If CONFIG_ARCH_LEDs is defined, then NuttX will control the LED on board
++ * the MR-BMS771.  The following definitions describe how NuttX controls
++ * the LEDs:
++ *
++ *   SYMBOL            Meaning                    LED state
++ *                                                RED    GREEN  BLUE
++ *   ----------------  ------------------------  --------------------
++ *   LED_STARTED       NuttX has been started     OFF    OFF    OFF
++ *   LED_HEAPALLOCATE  Heap has been allocated    OFF    OFF    ON
++ *   LED_IRQSENABLED   Interrupts enabled         OFF    OFF    ON
++ *   LED_STACKCREATED  Idle stack created         OFF    ON     OFF
++ *   LED_INIRQ         In an interrupt           (No change)
++ *   LED_SIGNAL        In a signal handler       (No change)
++ *   LED_ASSERTION     An assertion failed       (No change)
++ *   LED_PANIC         The system has crashed     FLASH  OFF    OFF
++ *   LED_IDLE          S32K146 is in sleep mode  (Optional, not used)
++ */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++#include <stdint.h>
++#include <stdbool.h>
++
++#include <nuttx/board.h>
++
++#include "s32k1xx_pin.h"
++
++#include "mr-bms771.h"
++
++#ifdef CONFIG_ARCH_LEDS
++
++/****************************************************************************
++ * Pre-processor Definitions
++ ****************************************************************************/
++
++/* Summary of all possible settings */
++
++#define LED_NOCHANGE     0 /* LED_IRQSENABLED, LED_INIRQ, LED_SIGNAL, LED_ASSERTION */
++#define LED_OFF_OFF_OFF  1 /* LED_STARTED */
++#define LED_OFF_OFF_ON   2 /* LED_HEAPALLOCATE */
++#define LED_OFF_ON_OFF   3 /* LED_STACKCREATED */
++#define LED_ON_OFF_OFF   4 /* LED_PANIC */
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: board_autoled_initialize
++ ****************************************************************************/
++
++void board_autoled_initialize(void)
++{
++  /* Configure LED GPIOs for output */
++
++  s32k1xx_pinconfig(GPIO_LED_R);
++  s32k1xx_pinconfig(GPIO_LED_G);
++  s32k1xx_pinconfig(GPIO_LED_B);
++}
++
++/****************************************************************************
++ * Name: board_autoled_on
++ ****************************************************************************/
++
++void board_autoled_on(int led)
++{
++  if (led != LED_NOCHANGE)
++    {
++      bool redon   = false;
++      bool greenon = false;
++      bool blueon  = false;
++
++      switch (led)
++        {
++          default:
++          case LED_OFF_OFF_OFF:
++            break;
++
++          case LED_OFF_OFF_ON:
++            blueon = true;
++            break;
++
++          case LED_OFF_ON_OFF:
++            greenon = true;
++            break;
++
++          case LED_ON_OFF_OFF:
++            redon = true;
++            break;
++        }
++
++      /* Invert output, an output of '0' illuminates the LED */
++
++      s32k1xx_gpiowrite(GPIO_LED_R, !redon);
++      s32k1xx_gpiowrite(GPIO_LED_G, !greenon);
++      s32k1xx_gpiowrite(GPIO_LED_B, !blueon);
++    }
++}
++
++/****************************************************************************
++ * Name: board_autoled_off
++ ****************************************************************************/
++
++void board_autoled_off(int led)
++{
++  if (led == LED_ON_OFF_OFF)
++    {
++      /* Invert outputs, an output of '0' illuminates the LED */
++
++      s32k1xx_gpiowrite(GPIO_LED_R, !true);
++      s32k1xx_gpiowrite(GPIO_LED_G, !false);
++      s32k1xx_gpiowrite(GPIO_LED_B, !false);
++    }
++}
++
++#endif /* CONFIG_ARCH_LEDS */
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_boot.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_boot.c
+new file mode 100644
+index 0000000000..5db70fe8d3
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_boot.c
+@@ -0,0 +1,82 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_boot.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++#include <nuttx/arch.h>
++#include <nuttx/board.h>
++#include <arch/board/board.h>
++#include "mr-bms771.h"
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: s32k1xx_board_initialize
++ *
++ * Description:
++ *   All S32K1XX architectures must provide the following entry point.  This
++ *   entry point is called early in the initialization -- after all memory
++ *   has been configured and mapped but before any devices have been
++ *   initialized.
++ *
++ ****************************************************************************/
++
++void s32k1xx_board_initialize(void)
++{
++#ifdef CONFIG_SEGGER_SYSVIEW
++  up_perf_init((void *)MR_BMS771_RUN_SYSCLK_FREQUENCY);
++#endif
++
++#ifdef CONFIG_ARCH_LEDS
++  /* Configure on-board LEDs if LED support has been selected */
++
++  board_autoled_initialize();
++#endif
++}
++
++/****************************************************************************
++ * Name: board_late_initialize
++ *
++ * Description:
++ *   If CONFIG_BOARD_LATE_INITIALIZE is selected, then an additional
++ *   initialization call will be performed in the boot-up sequence to a
++ *   function called board_late_initialize().  board_late_initialize() will
++ *   be called immediately after up_initialize() is called and just before
++ *   the initial application is started.  This additional initialization
++ *   phase may be used, for example, to initialize board-specific device
++ *   drivers.
++ *
++ ****************************************************************************/
++
++#ifdef CONFIG_BOARD_LATE_INITIALIZE
++void board_late_initialize(void)
++{
++  /* Perform board-specific initialization */
++
++  s32k1xx_bringup();
++}
++#endif
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_bringup.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_bringup.c
+new file mode 100644
+index 0000000000..e6db05e065
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_bringup.c
+@@ -0,0 +1,242 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_bringup.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++#include <sys/types.h>
++#include <stdint.h>
++#include <syslog.h>
++
++#ifdef CONFIG_USERLED
++#  include <nuttx/leds/userled.h>
++#endif
++
++#ifdef CONFIG_FS_PROCFS
++#  include <nuttx/fs/fs.h>
++
++#  ifdef CONFIG_S32K1XX_RESETCAUSE_PROCFS
++#    include "s32k1xx_resetcause_procfs.h"
++#  endif
++#endif
++
++#ifdef CONFIG_S32K1XX_PROGMEM
++#  include <nuttx/mtd/mtd.h>
++#endif
++
++#ifdef CONFIG_S32K1XX_EEEPROM
++#  include "s32k1xx_eeeprom.h"
++#endif
++
++#ifdef CONFIG_SMBUS_SBD
++#  include <nuttx/i2c/i2c_slave.h>
++#  include "s32k1xx_lpi2c_slave.h"
++#  include <arch/board/smbus_sbd.h>
++#endif
++
++#ifdef CONFIG_S32K1XX_FLEXCAN
++#  include "s32k1xx_flexcan.h"
++#endif
++
++#ifdef CONFIG_VIDEO_FB
++#   include <nuttx/video/fb.h>
++#endif
++
++#include "mr-bms771.h"
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: s32k1xx_bringup
++ *
++ * Description:
++ *   Perform architecture-specific initialization
++ *
++ *   CONFIG_BOARD_LATE_INITIALIZE=y :
++ *     Called from board_late_initialize().
++ *
++ *   CONFIG_BOARD_LATE_INITIALIZE=n && CONFIG_BOARDCTL=y :
++ *     Called from the NSH library
++ *
++ ****************************************************************************/
++
++int s32k1xx_bringup(void)
++{
++  int ret = OK;
++
++#ifdef CONFIG_USERLED
++  /* Register the LED driver */
++
++  ret = userled_lower_initialize("/dev/userleds");
++  if (ret < 0)
++    {
++      syslog(LOG_ERR, "ERROR: userled_lower_initialize() failed: %d\n", ret);
++    }
++#endif
++
++#ifdef CONFIG_FS_PROCFS
++  /* Register procfs entries before mounting */
++
++#  ifdef CONFIG_S32K1XX_RESETCAUSE_PROCFS
++  ret = s32k1xx_resetcause_procfs_register();
++  if (ret < 0)
++    {
++      syslog(LOG_ERR,
++             "ERROR: Failed to register MCU Reset Cause PROCFS entry: %d\n",
++             ret);
++    }
++#  endif /* CONFIG_S32K1XX_RESETCAUSE_PROCFS */
++
++#  ifdef CONFIG_S32K1XX_NRSTCHECK_PROCFS
++  ret = s32k1xx_nrstcheck_procfs_register();
++  if (ret < 0)
++    {
++      syslog(LOG_ERR,
++             "ERROR: Failed to register nRST Check PROCFS entry: %d\n", ret);
++    }
++#  endif /* CONFIG_S32K1XX_NRSTCHECK_PROCFS */
++
++  /* Mount the procfs file system */
++
++  ret = nx_mount(NULL, "/proc", "procfs", 0, NULL);
++  if (ret < 0)
++    {
++      syslog(LOG_ERR, "ERROR: Failed to mount procfs at /proc: %d\n", ret);
++    }
++#endif /* CONFIG_FS_PROCFS */
++
++#ifdef CONFIG_DEV_GPIO
++  /* Initialize and register the GPIO driver */
++
++  ret = s32k1xx_gpio_initialize();
++  if (ret < 0)
++    {
++      syslog(LOG_ERR, "ERROR: Failed to initialize GPIO driver: %d\n", ret);
++    }
++#endif /* CONFIG_DEV_GPIO */
++
++#ifdef CONFIG_S32K1XX_PROGMEM
++  struct mtd_dev_s *mtd;
++
++  mtd = progmem_initialize();
++  if (mtd == NULL)
++    {
++      syslog(LOG_ERR, "ERROR: progmem_initialize() failed\n");
++    }
++#endif /* CONFIG_S32K1XX_PROGMEM */
++
++#ifdef CONFIG_S32K1XX_EEEPROM
++  /* Register EEEPROM block device */
++
++  ret = s32k1xx_eeeprom_register(0, 4096);
++  if (ret < 0)
++    {
++      syslog(LOG_ERR, "ERROR: s32k1xx_eeeprom_register() failed\n");
++    }
++#endif /* CONFIG_S32K1XX_EEEPROM */
++
++#ifdef CONFIG_S32K1XX_LPI2C
++  /* Initialize I2C driver */
++
++  ret = s32k1xx_i2cdev_initialize();
++  if (ret < 0)
++    {
++      syslog(LOG_ERR, "ERROR: s32k1xx_i2cdev_initialize() failed: %d\n",
++             ret);
++    }
++#endif /* CONFIG_S32K1XX_LPI2C */
++
++#ifdef CONFIG_VIDEO_FB
++  /* Register the framebuffer device for the display */
++
++  ret = fb_register(0, 0);
++  if (ret < 0)
++    {
++      syslog(LOG_ERR, "ERROR: fb_register() failed: %d\n", ret);
++    }
++#endif /* CONFIG_VIDEO_FB */
++
++#if defined(CONFIG_S32K1XX_LPI2C) && defined(CONFIG_I2C_SLAVE) && \
++    defined(CONFIG_SMBUS_SBD)
++  /* Initialize I2C slave device */
++
++  struct i2c_slave_s *lpi2c0_slave = s32k1xx_i2cbus_slave_initialize(0);
++  if (lpi2c0_slave == NULL)
++    {
++      syslog(LOG_ERR, "ERROR: s32k1xx_i2cbus_slave_initialize() failed\n");
++    }
++
++  /* Initialize a new SMBus Smart Battery Data slave device as
++   * /dev/smbus-sbd0
++   */
++
++  ret = smbus_sbd_initialize(0, lpi2c0_slave);
++  if (ret < 0)
++    {
++      syslog(LOG_ERR, "ERROR: smbus_sbd_initialize() failed: %d\n", ret);
++    }
++#endif /* CONFIG_S32K1XX_LPI2C && CONFIG_I2C_SLAVE && CONFIG_SMBUS_SBD */
++
++#ifdef CONFIG_S32K1XX_LPSPI
++  /* Initialize SPI driver */
++
++  ret = s32k1xx_spidev_initialize();
++  if (ret < 0)
++    {
++      syslog(LOG_ERR, "ERROR: s32k1xx_spidev_initialize() failed: %d\n",
++             ret);
++    }
++#endif /* CONFIG_S32K1XX_LPSPI */
++
++#ifdef CONFIG_NETDEV_LATEINIT
++#  ifdef CONFIG_S32K1XX_FLEXCAN0
++  /* Initialize FlexCAN0 driver */
++
++  ret = s32k1xx_caninitialize(0);
++  if (ret < 0)
++    {
++      syslog(LOG_ERR, "ERROR: s32k1xx_caninitialize(0) failed: %d\n", ret);
++    }
++#  endif /* CONFIG_S32K1XX_FLEXCAN0 */
++#  ifdef CONFIG_S32K1XX_FLEXCAN1
++
++  /* STB high enables CAN phy on TJA1463ATK */
++
++  s32k1xx_pinconfig(PIN_CAN1_STB | GPIO_OUTPUT_ONE);
++  #warning is this OK?, maybe GPIO_OUTPUT_ZERO, maybe GPIO, maybe #else other polarity
++  /* Initialize FlexCAN1 driver */
++
++  ret = s32k1xx_caninitialize(1);
++  if (ret < 0)
++    {
++      syslog(LOG_ERR, "ERROR: s32k1xx_caninitialize(1) failed: %d\n", ret);
++    }
++#  endif /* CONFIG_S32K1XX_FLEXCAN1 */
++#endif /* CONFIG_NETDEV_LATEINIT */
++
++  return ret;
++}
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_clockconfig.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_clockconfig.c
+new file mode 100644
+index 0000000000..0f9159c2de
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_clockconfig.c
+@@ -0,0 +1,181 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_clockconfig.c
++ *
++ *   Copyright (c) 2013 - 2015, Freescale Semiconductor, Inc.
++ *   Copyright 2016-2025 NXP
++ *   All rights reserved.
++ *
++ * THIS SOFTWARE IS PROVIDED BY NXP "AS IS" AND ANY EXPRESSED OR
++ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++ * IN NO EVENT SHALL NXP OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
++ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
++ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
++ * THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ ****************************************************************************/
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++#include "s32k1xx_clockconfig.h"
++#include "s32k1xx_start.h"
++
++#include "mr-bms771.h"
++
++/****************************************************************************
++ * Public Data
++ ****************************************************************************/
++
++/* Each S32K1XX board must provide the following initialized structure.
++ * This is needed to establish the initial board clocking.
++ */
++
++const struct clock_configuration_s g_initial_clkconfig =
++{
++  .scg =
++  {
++    .sirc          =
++    {
++      .range       = SCG_SIRC_RANGE_HIGH,              /* RANGE - High range (8 MHz) */
++      .div1        = SCG_ASYNC_CLOCK_DISABLE,          /* SIRCDIV1 */
++      .div2        = SCG_ASYNC_CLOCK_DIV_BY_4,         /* SIRCDIV2 */
++      .initialize  = true,                             /* Initialize */
++      .stopmode    = false,                            /* SIRCSTEN */
++      .lowpower    = true,                             /* SIRCLPEN */
++      .locked      = false,                            /* LK */
++    },
++    .firc          =
++    {
++      .range       = SCG_FIRC_RANGE_48M,               /* RANGE */
++      .div1        = SCG_ASYNC_CLOCK_DISABLE,          /* FIRCDIV1 */
++      .div2        = SCG_ASYNC_CLOCK_DISABLE,          /* FIRCDIV2 */
++      .initialize  = false,                            /* Initialize */
++      .regulator   = false,                            /* FIRCREGOFF */
++      .locked      = false,                            /* LK */
++    },
++    .sosc          =
++    {
++      .mode        = SCG_SOSC_MONITOR_DISABLE,         /* SOSCCM */
++      .gain        = SCG_SOSC_GAIN_LOW,                /* HGO */
++      .range       = SCG_SOSC_RANGE_HIGH,              /* RANGE */
++      .extref      = SCG_SOSC_REF_OSC,                 /* EREFS */
++      .div1        = SCG_ASYNC_CLOCK_DISABLE,          /* SOSCDIV1 */
++      .div2        = SCG_ASYNC_CLOCK_DISABLE,          /* SOSCDIV2 */
++      .initialize  = true,                             /* Initialize */
++      .locked      = false,                            /* LK */
++    },
++    .spll          =
++    {
++      .mode        = SCG_SPLL_MONITOR_DISABLE,         /* SPLLCM */
++      .div1        = SCG_ASYNC_CLOCK_DISABLE,          /* SPLLDIV1 */
++      .div2        = SCG_ASYNC_CLOCK_DIV_BY_8,         /* SPLLDIV2 */
++      .prediv      = 4,                                /* PREDIV */
++      .mult        = 40,                               /* MULT */
++      .src         = 0,                                /* SOURCE */
++      .initialize  = true,                             /* Initialize */
++      .locked      = false,                            /* LK */
++    },
++    .rtc           =
++    {
++      .initialize  = true,                             /* Initialize */
++      .clkin       = 0,                                /* RTC_CLKIN */
++    },
++    .clockout      =
++    {
++      .source      = SCG_CLOCKOUT_SRC_FIRC,            /* SCG CLKOUTSEL */
++      .initialize  = false,                            /* Initialize */
++    },
++    .clockmode     =
++    {
++      .rccr        =                                   /* RCCR - Run Clock Control Register */
++      {
++        .src       = SCG_SYSTEM_CLOCK_SRC_SYS_PLL,     /* SCS */
++        .divslow   = 3,                                /* DIVSLOW, range 1..16 */
++        .divbus    = 2,                                /* DIVBUS, range 1..16 */
++        .divcore   = 2,                                /* DIVCORE, range 1..16 */
++      },
++      .vccr        =                                   /* VCCR - VLPR Clock Control Register */
++      {
++        .src       = SCG_SYSTEM_CLOCK_SRC_SIRC,        /* SCS */
++        .divslow   = 4,                                /* DIVSLOW, range 1..16 */
++        .divbus    = 1,                                /* DIVBUS, range 1..16 */
++        .divcore   = 2,                                /* DIVCORE, range 1..16 */
++      },
++      .hccr        =
++      {
++        .src       = SCG_SYSTEM_CLOCK_SRC_SYS_PLL,     /* SCS */
++        .divslow   = 3,                                /* DIVSLOW, range 1..16 */
++        .divbus    = 2,                                /* DIVBUS, range 1..16 */
++        .divcore   = 2,                                /* DIVCORE, range 1..16 */
++      },
++      .initialize  = true,                             /* Initialize */
++    },
++  },
++  .sim             =
++  {
++    .clockout      =                                   /* Clock Out configuration. */
++    {
++      .source      = SIM_CLKOUT_SEL_SYSTEM_SCG_CLKOUT, /* CLKOUTSEL */
++      .divider     = 1,                                /* CLKOUTDIV, range 1..8 */
++      .initialize  = false,                            /* Initialize */
++      .enable      = false,                            /* CLKOUTEN */
++    },
++    .lpoclk        =                                   /* Low Power Clock configuration. */
++    {
++      .rtc_source  = SIM_RTCCLK_SEL_LPO_32K,           /* RTCCLKSEL */
++      .lpo_source  = SIM_LPO_CLK_SEL_LPO_128K,         /* LPOCLKSEL */
++      .initialize  = true,                             /* Initialize */
++      .lpo32k      = true,                             /* LPO32KCLKEN */
++      .lpo1k       = true,                             /* LPO1KCLKEN */
++    },
++    .tclk          =                                   /* TCLK CLOCK configuration. */
++    {
++      .tclkfreq[0] = 0,                                /* TCLK0 */
++      .tclkfreq[1] = 0,                                /* TCLK1 */
++      .tclkfreq[2] = 0,                                /* TCLK2 */
++      .initialize  = true,                             /* Initialize */
++    },
++    .platgate      =                                   /* Platform Gate Clock configuration. */
++    {
++      .initialize  = true,                             /* Initialize */
++      .mscm        = true,                             /* CGCMSCM */
++      .mpu         = true,                             /* CGCMPU */
++      .dma         = true,                             /* CGCDMA */
++      .erm         = true,                             /* CGCERM */
++      .eim         = true,                             /* CGCEIM */
++    },
++    .traceclk      =                                   /* Debug trace Clock Configuration. */
++    {
++      .source      = CLOCK_TRACE_SRC_CORE_CLK,         /* TRACECLK_SEL */
++      .divider     = 1,                                /* TRACEDIV, range 1..8 */
++      .initialize  = true,                             /* Initialize */
++      .enable      = true,                             /* TRACEDIVEN */
++      .fraction    = false,                            /* TRACEFRAC */
++    },
++  },
++  .pcc             =
++  {
++    .pclks         = g_peripheral_clockconfig0,        /* Peripheral clock configurations */
++  },
++  .pmc             =
++  {
++    .lpoclk        =                                   /* Low Power Clock configuration. */
++    {
++      .trim        = 0,                                /* Trimming value for LPO */
++      .initialize  = true,                             /* Initialize */
++      .enable      = true,                             /* Enable/disable LPO */
++    },
++  },
++};
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_gpio.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_gpio.c
+new file mode 100644
+index 0000000000..5ea1e7f3d6
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_gpio.c
+@@ -0,0 +1,494 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_gpio.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++#include <sys/types.h>
++#include <stdbool.h>
++#include <stdint.h>
++#include <assert.h>
++#include <debug.h>
++#include <errno.h>
++
++#include <nuttx/ioexpander/gpio.h>
++
++#include "s32k1xx_pin.h"
++
++#include "mr-bms771.h"
++
++#if defined(CONFIG_DEV_GPIO) && !defined(CONFIG_GPIO_LOWER_HALF)
++
++/****************************************************************************
++ * Private Types
++ ****************************************************************************/
++
++struct s32k1xx_gpio_dev_s
++{
++  struct gpio_dev_s gpio;
++  uint8_t id;
++  pin_interrupt_t callback;
++};
++
++/****************************************************************************
++ * Private Function Prototypes
++ ****************************************************************************/
++
++static int s32k1xx_gpio_interrupt(int irq, void *context, void *arg);
++
++static int gpio_read(struct gpio_dev_s *dev, bool *value);
++static int gpio_write(struct gpio_dev_s *dev, bool value);
++#ifdef CONFIG_S32K1XX_GPIOIRQ
++static int gpio_irqattach(struct gpio_dev_s *dev, pin_interrupt_t callback);
++static int gpio_irqenable(struct gpio_dev_s *dev, bool enable);
++#endif /* CONFIG_S32K1XX_GPIOIRQ */
++static int gpio_setpintype(struct gpio_dev_s *dev,
++                           enum gpio_pintype_e pintype);
++
++/****************************************************************************
++ * Private Data
++ ****************************************************************************/
++
++/* Set of GPIO pins */
++
++static uint32_t g_gpiopins[] =
++{
++  GPIO0,
++  GPIO1,
++  GPIO2,
++  GPIO3,
++  GPIO4,
++  GPIO5,
++  GPIO6,
++  GPIO7,
++  GPIO8,
++  GPIO9,
++  GPIO10,
++  GPIO11,
++  GPIO12,
++  GPIO13,
++  GPIO14,
++  GPIO15,
++  GPIO16,
++  GPIO17,
++  GPIO18,
++};
++
++#if NUM_OF_GPIO > 0
++static struct s32k1xx_gpio_dev_s g_gpio[NUM_OF_GPIO];
++#endif
++
++/* Different pin types support different operations */
++
++static const struct gpio_operations_s gpin_ops =
++{
++  .go_read       = gpio_read,
++  .go_write      = NULL,
++  .go_attach     = NULL,
++  .go_enable     = NULL,
++  .go_setpintype = gpio_setpintype,
++};
++
++static const struct gpio_operations_s gpout_ops =
++{
++  .go_read       = gpio_read,
++  .go_write      = gpio_write,
++  .go_attach     = NULL,
++  .go_enable     = NULL,
++  .go_setpintype = gpio_setpintype,
++};
++
++#ifdef CONFIG_S32K1XX_GPIOIRQ
++static const struct gpio_operations_s gpint_ops =
++{
++  .go_read       = gpio_read,
++  .go_write      = NULL,
++  .go_attach     = gpio_irqattach,
++  .go_enable     = gpio_irqenable,
++  .go_setpintype = gpio_setpintype,
++};
++#endif /* CONFIG_S32K1XX_GPIOIRQ */
++
++/****************************************************************************
++ * Private Functions
++ ****************************************************************************/
++
++#ifdef CONFIG_S32K1XX_GPIOIRQ
++static int s32k1xx_gpio_interrupt(int irq, void *context, void *arg)
++{
++  struct s32k1xx_gpio_dev_s *s32k1xx_gpio = (struct s32k1xx_gpio_dev_s *)arg;
++
++  DEBUGASSERT(s32k1xx_gpio != NULL && s32k1xx_gpio->callback != NULL);
++  gpioinfo("Interrupt! callback=%p\n", s32k1xx_gpio->callback);
++
++  s32k1xx_gpio->callback(&s32k1xx_gpio->gpio, s32k1xx_gpio->id);
++  return OK;
++}
++#endif /* CONFIG_S32K1XX_GPIOIRQ */
++
++static int gpio_read(struct gpio_dev_s *dev, bool *value)
++{
++  struct s32k1xx_gpio_dev_s *s32k1xx_gpio = (struct s32k1xx_gpio_dev_s *)dev;
++
++  DEBUGASSERT(s32k1xx_gpio != NULL && value != NULL);
++  DEBUGASSERT(s32k1xx_gpio->id < NUM_OF_GPIO);
++  gpioinfo("Reading...\n");
++
++  *value = s32k1xx_gpioread(g_gpiopins[s32k1xx_gpio->id]);
++  return OK;
++}
++
++static int gpio_write(struct gpio_dev_s *dev, bool value)
++{
++  struct s32k1xx_gpio_dev_s *s32k1xx_gpio = (struct s32k1xx_gpio_dev_s *)dev;
++
++  DEBUGASSERT(s32k1xx_gpio != NULL);
++  DEBUGASSERT(s32k1xx_gpio->id < NUM_OF_GPIO);
++  gpioinfo("Writing %d\n", (int) value);
++
++  s32k1xx_gpiowrite(g_gpiopins[s32k1xx_gpio->id], value);
++  return OK;
++}
++
++#ifdef CONFIG_S32K1XX_GPIOIRQ
++static int gpio_irqattach(struct gpio_dev_s *dev, pin_interrupt_t callback)
++{
++  struct s32k1xx_gpio_dev_s *s32k1xx_gpio = (struct s32k1xx_gpio_dev_s *)dev;
++
++  gpioinfo("Attaching the callback\n");
++  s32k1xx_pinirqattach(g_gpiopins[s32k1xx_gpio->id], s32k1xx_gpio_interrupt,
++                       &g_gpio[s32k1xx_gpio->id]);
++
++  gpioinfo("Attach %p\n", callback);
++  s32k1xx_gpio->callback = callback;
++  return OK;
++}
++
++static int gpio_irqenable(struct gpio_dev_s *dev, bool enable)
++{
++  struct s32k1xx_gpio_dev_s *s32k1xx_gpio = (struct s32k1xx_gpio_dev_s *)dev;
++
++  DEBUGASSERT(s32k1xx_gpio != NULL);
++
++  if (enable)
++    {
++      if (s32k1xx_gpio->callback != NULL)
++        {
++          gpioinfo("Enabling the interrupt\n");
++          s32k1xx_pinirqenable(g_gpiopins[s32k1xx_gpio->id]);
++        }
++    }
++  else
++    {
++      gpioinfo("Disable the interrupt\n");
++      s32k1xx_pinirqdisable(g_gpiopins[s32k1xx_gpio->id]);
++    }
++
++  return OK;
++}
++#endif /* CONFIG_S32K1XX_GPIOIRQ */
++
++static int gpio_setpintype(struct gpio_dev_s *dev,
++                           enum gpio_pintype_e pintype)
++{
++  int ret = OK;
++  uint32_t pinconfig;
++  const struct gpio_operations_s *gpio_ops;
++  struct s32k1xx_gpio_dev_s *s32k1xx_gpio = (struct s32k1xx_gpio_dev_s *)dev;
++
++  DEBUGASSERT(s32k1xx_gpio != NULL);
++  DEBUGASSERT(s32k1xx_gpio->id < NUM_OF_GPIO);
++  gpioinfo("Setpintype...\n");
++
++  /* Check if the new pintype is actually different from the old pintype */
++
++  if (s32k1xx_gpio->gpio.gp_pintype == pintype)
++    {
++      /* Pintype has not changed. We're done already. */
++
++      return ret;
++    }
++
++  /* Clear the pin mode, pin options and interrupt options */
++
++  pinconfig = (g_gpiopins[s32k1xx_gpio->id] &
++              ~(_PIN_MODE_MASK | _PIN_OPTIONS_MASK | _PIN_INT_MASK));
++
++  /* Set the pinconfig and device operations according to the new pintype */
++
++  switch (pintype)
++    {
++      case GPIO_INPUT_PIN:
++        {
++          pinconfig |= GPIO_INPUT;
++          gpio_ops = &gpin_ops;
++        }
++        break;
++
++      case GPIO_INPUT_PIN_PULLUP:
++        {
++          pinconfig |= GPIO_PULLUP;
++          gpio_ops = &gpin_ops;
++        }
++        break;
++
++      case GPIO_INPUT_PIN_PULLDOWN:
++        {
++          pinconfig |= GPIO_PULLDOWN;
++          gpio_ops = &gpin_ops;
++        }
++        break;
++
++      case GPIO_OUTPUT_PIN:
++        {
++          pinconfig |= GPIO_OUTPUT;
++          gpio_ops = &gpout_ops;
++        }
++        break;
++
++#ifdef CONFIG_S32K1XX_GPIOIRQ
++      case GPIO_INTERRUPT_HIGH_PIN:
++        {
++          pinconfig |= (GPIO_INPUT | PIN_INT_ONE);
++          gpio_ops = &gpint_ops;
++        }
++        break;
++
++      case GPIO_INTERRUPT_LOW_PIN:
++        {
++          pinconfig |= (GPIO_INPUT | PIN_INT_ZERO);
++          gpio_ops = &gpint_ops;
++        }
++        break;
++
++      case GPIO_INTERRUPT_RISING_PIN:
++        {
++          pinconfig |= (GPIO_INPUT | PIN_INT_RISING);
++          gpio_ops = &gpint_ops;
++        }
++        break;
++
++      case GPIO_INTERRUPT_FALLING_PIN:
++        {
++          pinconfig |= (GPIO_INPUT | PIN_INT_FALLING);
++          gpio_ops = &gpint_ops;
++        }
++        break;
++
++      case GPIO_INTERRUPT_BOTH_PIN:
++      case GPIO_INTERRUPT_PIN:
++        {
++          pinconfig |= (GPIO_INPUT | PIN_INT_BOTH);
++          gpio_ops = &gpint_ops;
++        }
++        break;
++#endif /* CONFIG_S32K1XX_GPIOIRQ */
++
++      default:
++        {
++          /* Not implemented yet! */
++
++          return -EINVAL; /* Return without changing the pin settings */
++        }
++        break;
++    }
++
++#ifdef CONFIG_S32K1XX_GPIOIRQ
++  /* If the pin previously had an interrupt pintype... */
++
++  if ((s32k1xx_gpio->gpio.gp_pintype >= GPIO_INTERRUPT_PIN) &&
++      (s32k1xx_gpio->gpio.gp_pintype < GPIO_NPINTYPES))
++    {
++      /* ...disable the interrupt... */
++
++      ret = gpio_irqenable(dev, false);
++      if (ret < 0)
++        {
++          return ret;
++        }
++
++      /* ...and detach the old callback. */
++
++      ret = gpio_irqattach(dev, NULL);
++      if (ret < 0)
++        {
++          return ret;
++        }
++    }
++#endif /* CONFIG_S32K1XX_GPIOIRQ */
++
++  /* Change the pintype and set of operations */
++
++  s32k1xx_gpio->gpio.gp_pintype = pintype;
++  s32k1xx_gpio->gpio.gp_ops = gpio_ops;
++
++  /* Reconfigure the actual pin */
++
++  g_gpiopins[s32k1xx_gpio->id] = pinconfig;
++  ret = s32k1xx_pinconfig(pinconfig);
++
++  return ret;
++}
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: s32k1xx_gpio_initialize
++ *
++ * Description:
++ *   Initialize GPIO drivers for use with /apps/examples/gpio
++ *
++ ****************************************************************************/
++
++int s32k1xx_gpio_initialize(void)
++{
++  int ret = OK;
++
++#if NUM_OF_GPIO > 0
++  int i;
++  uint32_t pinset;
++
++  for (i = 0; i < NUM_OF_GPIO; i++)
++    {
++      DEBUGASSERT((g_gpiopins[i] & (_PIN_MODE_MASK)) == _PIN_MODE_GPIO);
++
++      g_gpio[i].id = i;
++
++      /* Find which pin type we are dealing with */
++
++      pinset = g_gpiopins[i];
++
++      if ((pinset & (_PIN_IO_MASK)) == _PIN_INPUT)
++        {
++#  ifdef CONFIG_S32K1XX_GPIOIRQ
++          /* Input pin (with or without interrupt) */
++
++          if (pinset & (_PIN_INTERRUPT))
++            {
++              /* Interrupt pin */
++
++              g_gpio[i].gpio.gp_ops = &gpint_ops;
++
++              /* Determine specific interrupt pin type */
++
++              switch (pinset & (_PIN_INTERRUPT))
++                {
++                  case PIN_INT_ONE:
++                    {
++                      g_gpio[i].gpio.gp_pintype = GPIO_INTERRUPT_HIGH_PIN;
++                    }
++                    break;
++
++                  case PIN_INT_ZERO:
++                    {
++                      g_gpio[i].gpio.gp_pintype = GPIO_INTERRUPT_LOW_PIN;
++                    }
++                    break;
++
++                  case PIN_INT_RISING:
++                    {
++                      g_gpio[i].gpio.gp_pintype = GPIO_INTERRUPT_RISING_PIN;
++                    }
++                    break;
++
++                  case PIN_INT_FALLING:
++                    {
++                      g_gpio[i].gpio.gp_pintype = GPIO_INTERRUPT_FALLING_PIN;
++                    }
++                    break;
++
++                  case PIN_INT_BOTH:
++                    {
++                      g_gpio[i].gpio.gp_pintype = GPIO_INTERRUPT_BOTH_PIN;
++                    }
++                    break;
++
++                  default:
++                    {
++                      g_gpio[i].gpio.gp_pintype = GPIO_INTERRUPT_PIN;
++                    }
++                    break;
++                }
++            }
++          else
++#  endif /* CONFIG_S32K1XX_GPIOIRQ */
++            {
++              /* Input pin without interrupt */
++
++              g_gpio[i].gpio.gp_ops = &gpin_ops;
++
++              /* Determine specific input pin type */
++
++              switch (pinset & (_PIN_INPUT_PULLMASK))
++                {
++                  case _PIN_INPUT_PULLUP:
++                    {
++                      g_gpio[i].gpio.gp_pintype = GPIO_INPUT_PIN_PULLUP;
++                    }
++                    break;
++
++                  case _PIN_INPUT_PULLDOWN:
++                    {
++                      g_gpio[i].gpio.gp_pintype = GPIO_INPUT_PIN_PULLDOWN;
++                    }
++                    break;
++
++                  default:
++                    {
++                      g_gpio[i].gpio.gp_pintype = GPIO_INPUT_PIN;
++                    }
++                    break;
++                }
++            }
++        }
++      else
++        {
++          /* Output pin */
++
++          g_gpio[i].gpio.gp_ops = &gpout_ops;
++          g_gpio[i].gpio.gp_pintype = GPIO_OUTPUT_PIN;
++        }
++
++      /* Configure and register the GPIO pin */
++
++      ret = s32k1xx_pinconfig(g_gpiopins[i]);
++      if (ret < 0)
++        {
++          return ret;
++        }
++
++      ret = gpio_pin_register(&g_gpio[i].gpio, i);
++      if (ret < 0)
++        {
++          return ret;
++        }
++    }
++#endif
++
++  return ret;
++}
++#endif /* CONFIG_DEV_GPIO && !CONFIG_GPIO_LOWER_HALF */
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_i2c.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_i2c.c
+new file mode 100644
+index 0000000000..b17a3c0c58
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_i2c.c
+@@ -0,0 +1,84 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_i2c.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++#include <nuttx/compiler.h>
++
++#include <sys/types.h>
++#include <stdint.h>
++#include <errno.h>
++#include <debug.h>
++
++#include <nuttx/i2c/i2c_master.h>
++
++#include "s32k1xx_lpi2c.h"
++
++#include "mr-bms771.h"
++
++#if defined(CONFIG_S32K1XX_LPI2C) && defined(CONFIG_I2C_DRIVER)
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: s32k1xx_i2cdev_initialize
++ *
++ * Description:
++ *   Initialize I2C driver and register /dev/i2cN devices.
++ *
++ ****************************************************************************/
++
++int weak_function s32k1xx_i2cdev_initialize(void)
++{
++  int ret = OK;
++
++#ifdef CONFIG_S32K1XX_LPI2C0
++  /* LPI2C0 *****************************************************************/
++
++  /* Initialize LPI2C0 */
++
++  struct i2c_master_s *lpi2c0 = s32k1xx_i2cbus_initialize(0);
++  if (lpi2c0 == NULL)
++    {
++      i2cerr("ERROR: FAILED to initialize LPI2C0\n");
++      return -ENODEV;
++    }
++
++  /* Register LPI2C0 character driver */
++
++  ret = i2c_register(lpi2c0, 0);
++  if (ret < 0)
++    {
++      i2cerr("ERROR: FAILED to register LPI2C0 driver\n");
++      return ret;
++    }
++#endif /* CONFIG_S32K1XX_LPI2C0 */
++
++  return ret;
++}
++
++#endif /* CONFIG_S32K1XX_LPI2C && CONFIG_I2C_DRIVER */
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_nrstcheck_procfs.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_nrstcheck_procfs.c
+new file mode 100644
+index 0000000000..22168eab6d
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_nrstcheck_procfs.c
+@@ -0,0 +1,329 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_nrstcheck_procfs.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++#include <nuttx/fs/fs.h>
++#include <nuttx/fs/procfs.h>
++#include <nuttx/kmalloc.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <stdbool.h>
++#include <stdint.h>
++#include <assert.h>
++#include <errno.h>
++#include <stdio.h>
++#include <string.h>
++#include <fcntl.h>
++#include <debug.h>
++
++#include "hardware/s32k1xx_pinmux.h"
++#include "s32k1xx_pin.h"
++
++#include "mr-bms771.h"
++
++#ifdef CONFIG_S32K1XX_NRSTCHECK_PROCFS
++
++/****************************************************************************
++ * Pre-processor Definitions
++ ****************************************************************************/
++
++/* Determines the size of an intermediate buffer that must be large enough
++ * to handle the longest line generated by this logic.
++ */
++
++#define S32K1XX_NRSTCHECK_LINELEN 2
++
++/****************************************************************************
++ * Private Types
++ ****************************************************************************/
++
++/* This structure describes one open "file" */
++
++struct s32k1xx_nrstcheck_procfs_file_s
++{
++  struct procfs_file_s base;            /* Base open file structure */
++  unsigned int linesize;                /* Number of valid characters in line[] */
++  char line[S32K1XX_NRSTCHECK_LINELEN]; /* Pre-allocated buffer for formatted lines */
++};
++
++/****************************************************************************
++ * Private Function Prototypes
++ ****************************************************************************/
++
++static int s32k1xx_nrstcheck_procfs_open(struct file *filep,
++                                         const char *relpath, int oflags,
++                                         mode_t mode);
++static int s32k1xx_nrstcheck_procfs_close(struct file *filep);
++static ssize_t s32k1xx_nrstcheck_procfs_read(struct file *filep,
++                                             char *buffer, size_t buflen);
++static int s32k1xx_nrstcheck_procfs_dup(const struct file *oldp,
++                                        struct file *newp);
++static int s32k1xx_nrstcheck_procfs_stat(const char *relpath,
++                                         struct stat *buf);
++
++/****************************************************************************
++ * Private Data
++ ****************************************************************************/
++
++const struct procfs_operations s32k1xx_nrstcheck_procfs_ops =
++{
++  s32k1xx_nrstcheck_procfs_open,  /* open */
++  s32k1xx_nrstcheck_procfs_close, /* close */
++  s32k1xx_nrstcheck_procfs_read,  /* read */
++  NULL,                           /* write */
++  s32k1xx_nrstcheck_procfs_dup,   /* dup */
++  NULL,                           /* opendir */
++  NULL,                           /* closedir */
++  NULL,                           /* readdir */
++  NULL,                           /* rewinddir */
++  s32k1xx_nrstcheck_procfs_stat,  /* stat */
++};
++
++static const struct procfs_entry_s g_s32k1xx_nrstcheck_procfs =
++{
++  "nrstcheck", &s32k1xx_nrstcheck_procfs_ops
++};
++
++static bool g_s32k1xx_nrstcheck = false;
++
++/****************************************************************************
++ * Private Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: s32k1xx_nrstcheck_procfs_open
++ ****************************************************************************/
++
++static int s32k1xx_nrstcheck_procfs_open(struct file *filep,
++                                         const char *relpath, int oflags,
++                                         mode_t mode)
++{
++  struct s32k1xx_nrstcheck_procfs_file_s *attr;
++
++  finfo("Open '%s'\n", relpath);
++
++  /* PROCFS is read-only.  Any attempt to open with any kind of write
++   * access is not permitted.
++   *
++   * REVISIT:  Write-able proc files could be quite useful.
++   */
++
++  if ((oflags & O_WRONLY) != 0 || (oflags & O_RDONLY) == 0)
++    {
++      ferr("ERROR: Only O_RDONLY supported\n");
++      return -EACCES;
++    }
++
++  /* Allocate a container to hold the file attributes */
++
++  attr = kmm_zalloc(sizeof(struct s32k1xx_nrstcheck_procfs_file_s));
++  if (!attr)
++    {
++      ferr("ERROR: Failed to allocate file attributes\n");
++      return -ENOMEM;
++    }
++
++  /* Save the attributes as the open-specific state in filep->f_priv */
++
++  filep->f_priv = (void *)attr;
++  return OK;
++}
++
++/****************************************************************************
++ * Name: s32k1xx_nrstcheck_procfs_close
++ ****************************************************************************/
++
++static int s32k1xx_nrstcheck_procfs_close(struct file *filep)
++{
++  struct s32k1xx_nrstcheck_procfs_file_s *attr;
++
++  /* Recover our private data from the struct file instance */
++
++  attr = (struct s32k1xx_nrstcheck_procfs_file_s *)filep->f_priv;
++  DEBUGASSERT(attr);
++
++  /* Release the file attributes structure */
++
++  kmm_free(attr);
++  filep->f_priv = NULL;
++  return OK;
++}
++
++/****************************************************************************
++ * Name: s32k1xx_nrstcheck_procfs_read
++ ****************************************************************************/
++
++static ssize_t s32k1xx_nrstcheck_procfs_read(struct file *filep,
++                                             char *buffer, size_t buflen)
++{
++  struct s32k1xx_nrstcheck_procfs_file_s *attr;
++  off_t offset;
++
++  finfo("buffer=%p buflen=%d\n", buffer, (int)buflen);
++
++  /* Recover our private data from the struct file instance */
++
++  attr = (struct s32k1xx_nrstcheck_procfs_file_s *)filep->f_priv;
++  DEBUGASSERT(attr);
++
++  /* Convert the nRST check outcome to a string and save the linesize in case
++   * we are re-entered with f_pos > 0
++   */
++
++  attr->linesize = snprintf(attr->line, S32K1XX_NRSTCHECK_LINELEN, "%d",
++                            (int)g_s32k1xx_nrstcheck);
++
++  /* Transfer the nRST check outcome to user receive buffer */
++
++  offset = filep->f_pos;
++
++  return procfs_memcpy(attr->line, attr->linesize, buffer, buflen, &offset);
++}
++
++/****************************************************************************
++ * Name: s32k1xx_nrstcheck_procfs_dup
++ *
++ * Description:
++ *   Duplicate open file data in the new file structure.
++ *
++ ****************************************************************************/
++
++static int s32k1xx_nrstcheck_procfs_dup(const struct file *oldp,
++                                        struct file *newp)
++{
++  struct s32k1xx_nrstcheck_procfs_file_s *oldattr;
++  struct s32k1xx_nrstcheck_procfs_file_s *newattr;
++
++  finfo("Dup %p->%p\n", oldp, newp);
++
++  /* Recover our private data from the old struct file instance */
++
++  oldattr = (struct s32k1xx_nrstcheck_procfs_file_s *)oldp->f_priv;
++  DEBUGASSERT(oldattr);
++
++  /* Allocate a new container to hold the task and attribute selection */
++
++  newattr = kmm_malloc(sizeof(struct s32k1xx_nrstcheck_procfs_file_s));
++  if (!newattr)
++    {
++      ferr("ERROR: Failed to allocate file attributes\n");
++      return -ENOMEM;
++    }
++
++  /* The copy the file attributes from the old attributes to the new */
++
++  memcpy(newattr, oldattr, sizeof(struct s32k1xx_nrstcheck_procfs_file_s));
++
++  /* Save the new attributes in the new file structure */
++
++  newp->f_priv = (void *)newattr;
++  return OK;
++}
++
++/****************************************************************************
++ * Name: s32k1xx_nrstcheck_procfs_stat
++ *
++ * Description: Return information about a file or directory
++ *
++ ****************************************************************************/
++
++static int s32k1xx_nrstcheck_procfs_stat(const char *relpath,
++                                         struct stat *buf)
++{
++  /* "nrstcheck" is the name for a read-only file */
++
++  memset(buf, 0, sizeof(struct stat));
++  buf->st_mode = S_IFREG | S_IROTH | S_IRGRP | S_IRUSR;
++  return OK;
++}
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: s32k1xx_nrstcheck_procfs_register
++ *
++ * Description:
++ *   Check if the (active low) reset pin is being pulled high externally by
++ *   reconfiguring the pin (temporarily) to a GPIO input with weak pull-down.
++ *   The pin state is saved and registered as a PROCFS entry.  The pin will
++ *   then be reconfigured again as reset pin.
++ *
++ ****************************************************************************/
++
++int s32k1xx_nrstcheck_procfs_register(void)
++{
++  int ret;
++
++  /* Reconfigure the reset pin to GPIO input with weak pull-down enabled */
++
++  ret = s32k1xx_pinconfig(PIN_PTA5 | GPIO_PULLDOWN);
++  if (ret != OK)
++    {
++      ferr("ERROR: could not reconfigure nRST pin to GPIO input (pull-down):"
++           " %d\n", ret);
++      return ret;
++    }
++
++  /* Sleep for a small amount of time for the NRST pin to become low */
++  usleep(10);
++
++  /* Read the input level of the pin, which should be pulled high externally
++   * by a resistor or another IC
++   */
++
++  g_s32k1xx_nrstcheck = s32k1xx_gpioread(PIN_PTA5);
++
++  /* Reconfigure the reset pin to GPIO input with pull-up enabled, to avoid
++   * accidentally triggering a reset later
++   */
++
++  ret = s32k1xx_pinconfig(PIN_PTA5 | GPIO_PULLUP);
++  if (ret != OK)
++    {
++      ferr("ERROR: could not reconfigure nRST pin to GPIO input (pull-up):"
++           " %d\n", ret);
++      return ret;
++    }
++
++  /* Reconfigure to reset pin again */
++
++  ret = s32k1xx_pinconfig(PIN_RESET);
++  if (ret != OK)
++    {
++      ferr("ERROR: could not configure nRST pin: %d\n", ret);
++      return ret;
++    }
++
++  /* Register a PROCFS entry which contains the previously detected input
++   * state of the nRST pin
++   */
++
++  return procfs_register(&g_s32k1xx_nrstcheck_procfs);
++}
++
++#endif /* CONFIG_S32K1XX_NRSTCHECK_PROCFS */
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_periphclocks.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_periphclocks.c
+new file mode 100644
+index 0000000000..feae3c845b
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_periphclocks.c
+@@ -0,0 +1,148 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_periphclocks.c
++ *
++ *   Copyright (c) 2013 - 2015, Freescale Semiconductor, Inc.
++ *   Copyright 2016-2025 NXP
++ *   All rights reserved.
++ *
++ * THIS SOFTWARE IS PROVIDED BY NXP "AS IS" AND ANY EXPRESSED OR
++ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++ * IN NO EVENT SHALL NXP OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
++ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
++ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
++ * THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ ****************************************************************************/
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++#include "s32k14x/s32k14x_clocknames.h"
++#include "s32k1xx_periphclocks.h"
++
++#include "mr-bms771.h"
++
++/****************************************************************************
++ * Public Data
++ ****************************************************************************/
++
++/* Each S32K1XX board must provide the following initialized structure.
++ * This is needed to establish the initial peripheral clocking.
++ */
++
++const struct peripheral_clock_config_s g_peripheral_clockconfig0[] =
++{
++  {
++    .clkname = DMAMUX0_CLK,
++#ifdef CONFIG_S32K1XX_EDMA
++    .clkgate = true,
++#else
++    .clkgate = false,
++#endif
++  },
++  {
++    .clkname = FLEXCAN0_CLK,
++#ifdef CONFIG_S32K1XX_FLEXCAN0
++    .clkgate = true,
++#else
++    .clkgate = false,
++#endif
++  },
++  {
++    .clkname = FLEXCAN1_CLK,
++#ifdef CONFIG_S32K1XX_FLEXCAN1
++    .clkgate = true,
++#else
++    .clkgate = false,
++#endif
++  },
++  {
++    .clkname = LPI2C0_CLK,
++#ifdef CONFIG_S32K1XX_LPI2C0
++    .clkgate = true,
++#else
++    .clkgate = false,
++#endif
++    .clksrc  = CLK_SRC_SPLL_DIV2,
++  },
++  {
++    .clkname = LPSPI0_CLK,
++#ifdef CONFIG_S32K1XX_LPSPI0
++    .clkgate = true,
++#else
++    .clkgate = false,
++#endif
++    .clksrc  = CLK_SRC_SPLL_DIV2,
++  },
++  {
++    .clkname = LPSPI1_CLK,
++#ifdef CONFIG_S32K1XX_LPSPI1
++    .clkgate = true,
++#else
++    .clkgate = false,
++#endif
++    .clksrc  = CLK_SRC_SPLL_DIV2,
++  },
++  {
++    .clkname = LPUART0_CLK,
++#ifdef CONFIG_S32K1XX_LPUART0
++    .clkgate = true,
++#else
++    .clkgate = false,
++#endif
++    .clksrc  = CLK_SRC_SPLL_DIV2,
++  },
++  {
++    .clkname = LPUART1_CLK,
++#ifdef CONFIG_S32K1XX_LPUART1
++    .clkgate = true,
++#else
++    .clkgate = false,
++#endif
++    .clksrc  = CLK_SRC_SPLL_DIV2,
++  },
++  {
++    .clkname = PORTA_CLK,
++    .clkgate = true,
++  },
++  {
++    .clkname = PORTB_CLK,
++    .clkgate = true,
++  },
++  {
++    .clkname = PORTC_CLK,
++    .clkgate = true,
++  },
++  {
++    .clkname = PORTD_CLK,
++    .clkgate = true,
++  },
++  {
++    .clkname = PORTE_CLK,
++    .clkgate = true,
++  },
++  {
++    .clkname = RTC0_CLK,
++#ifdef CONFIG_S32K1XX_RTC
++    .clkgate = true,
++#else
++    .clkgate = false,
++#endif
++  },
++};
++
++unsigned int const num_of_peripheral_clocks_0 =
++    sizeof(g_peripheral_clockconfig0) /
++    sizeof(g_peripheral_clockconfig0[0]);
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_reset.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_reset.c
+new file mode 100644
+index 0000000000..1264f01e0a
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_reset.c
+@@ -0,0 +1,66 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_reset.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++#include <stdint.h>
++
++#include <nuttx/arch.h>
++#include <nuttx/board.h>
++
++#ifdef CONFIG_BOARDCTL_RESET
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: board_reset
++ *
++ * Description:
++ *   Reset board.  Support for this function is required by board-level
++ *   logic if CONFIG_BOARDCTL_RESET is selected.
++ *
++ * Input Parameters:
++ *   status - Status information provided with the reset event.  This
++ *            meaning of this status information is board-specific.  If not
++ *            used by a board, the value zero may be provided in calls to
++ *            board_reset().
++ *
++ * Returned Value:
++ *   If this function returns, then it was not possible to power-off the
++ *   board due to some constraints.  The return value in this case is a
++ *   board-specific reason for the failure to shutdown.
++ *
++ ****************************************************************************/
++
++int board_reset(int status)
++{
++  up_systemreset();
++  return 0;
++}
++
++#endif /* CONFIG_BOARDCTL_RESET */
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_smbus_sbd.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_smbus_sbd.c
+new file mode 100644
+index 0000000000..83d6e72950
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_smbus_sbd.c
+@@ -0,0 +1,925 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_smbus_sbd.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <assert.h>
++#include <errno.h>
++#include <debug.h>
++
++#include <nuttx/kmalloc.h>
++#include <nuttx/fs/fs.h>
++#include <nuttx/i2c/i2c_slave.h>
++
++#include <arch/board/smbus_sbd.h>
++
++#ifdef CONFIG_SMBUS_SBD
++
++/****************************************************************************
++ * Pre-processor Definitions
++ ****************************************************************************/
++
++/* Macros for splitting a 16-bit unsigned integer into two bytes */
++
++#define LOBYTE(n) ((uint8_t)((n) & 0x00ff))
++#define HIBYTE(n) ((uint8_t)(((n) & 0xff00) >> 8))
++
++/****************************************************************************
++ * Private Type Definitions
++ ****************************************************************************/
++
++/* Private data of the SMBus Smart Battery Data slave device */
++
++struct smbus_sbd_dev_s
++{
++  struct i2c_slave_s *i2c_slave_dev; /* Associated I2C slave device */
++  struct smbus_sbd_data_s *data;     /* Most recent battery data */
++
++  uint8_t read_buffer[3];   /* Pre-allocated read buffer */
++  uint8_t write_buffer[16]; /* Pre-allocated write buffer */
++
++#ifndef CONFIG_DISABLE_PSEUDOFS_OPERATIONS
++  uint8_t refs; /* Reference count */
++#endif
++};
++
++/****************************************************************************
++ * Private Function Prototypes
++ ****************************************************************************/
++
++static int smbus_sbd_open(struct file *filep);
++static int smbus_sbd_close(struct file *filep);
++static ssize_t smbus_sbd_read(struct file *filep, char *buffer,
++                              size_t buflen);
++static ssize_t smbus_sbd_write(struct file *filep, const char *buffer,
++                               size_t buflen);
++
++/****************************************************************************
++ * Private Data
++ ****************************************************************************/
++
++/* Valid operations that can be performed on the the SMBus Smart Battery Data
++ * slave character device:
++ */
++
++static const struct file_operations smbus_sbd_fops =
++{
++#ifndef CONFIG_DISABLE_PSEUDOFS_OPERATIONS
++  smbus_sbd_open,  /* open */
++  smbus_sbd_close, /* close */
++#else
++  NULL,            /* open */
++  NULL,            /* close */
++#endif
++  smbus_sbd_read,  /* read */
++  smbus_sbd_write, /* write */
++  NULL,            /* seek */
++  NULL,            /* ioctl */
++  NULL,            /* poll */
++#ifndef CONFIG_DISABLE_PSEUDOFS_OPERATIONS
++  NULL,            /* unlink */
++#endif
++};
++
++/****************************************************************************
++ * Private Functions
++ ****************************************************************************/
++
++#ifndef CONFIG_DISABLE_PSEUDOFS_OPERATIONS
++/****************************************************************************
++ * Name: smbus_sbd_open
++ *
++ * Description: Open the character device.
++ *
++ * Input Parameters:
++ *   filep - Instance of file struct
++ *
++ * Returned Value:
++ *   OK if the SMBus Smart Battery Data slave character device was
++ *   successfully opened; A negated errno value is returned on any failure.
++ *
++ ****************************************************************************/
++
++static int smbus_sbd_open(struct file *filep)
++{
++  struct smbus_sbd_dev_s *dev;
++
++  /* Retrieve the smbus_sbd_dev_s struct */
++
++  DEBUGASSERT(filep && filep->f_inode && filep->f_inode->i_private);
++  dev = (struct smbus_sbd_dev_s *)filep->f_inode->i_private;
++
++  /* Increase the open reference count */
++
++  dev->refs++;
++  DEBUGASSERT(dev->refs > 0);
++
++  return OK;
++}
++
++/****************************************************************************
++ * Name: smbus_sbd_close
++ *
++ * Description:
++ *   Close the character device.
++ *
++ * Input Parameters:
++ *   filep - Instance of file struct
++ *
++ * Returned Value:
++ *   OK if the SMBus Smart Battery Data slave character device was
++ *   successfully closed; A negated errno value is returned on any failure.
++ *
++ ****************************************************************************/
++
++static int smbus_sbd_close(struct file *filep)
++{
++  struct smbus_sbd_dev_s *dev;
++
++  /* Retrieve the smbus_sbd_dev_s struct */
++
++  DEBUGASSERT(filep && filep->f_inode && filep->f_inode->i_private);
++  dev = (struct smbus_sbd_dev_s *)filep->f_inode->i_private;
++
++  /* Decrease the open reference count */
++
++  DEBUGASSERT(dev->refs > 0);
++  dev->refs--;
++
++  return OK;
++}
++#endif /* CONFIG_DISABLE_PSEUDOFS_OPERATIONS */
++
++/****************************************************************************
++ * Name: smbus_sbd_read
++ *
++ * Description:
++ *   Reads the battery data that is currently known by the SMBus Smart
++ *   Battery Data slave driver into a smbus_sbd_data_s struct that needs
++ *   to be converted to a character buffer.
++ *
++ * Input Parameters:
++ *   filep  - Instance of file struct
++ *   buffer - Pointer to an empty smbus_sbd_data_s struct (cast to a
++ *            (char *)) which will be filled with the most recent battery
++ *            data that is available in the SMBus Smart Battery Data slave
++ *            driver.
++ *   buflen - Size of the provided smbus_sbd_data_s struct
++ *
++ * Returned Value:
++ *   On success, buflen is returned to indicate that all data has been
++ *   copied.  Zero will be returned if the provided buffer length is not
++ *   sufficient for a smbus_sbd_data_s struct.
++ *
++ ****************************************************************************/
++
++static ssize_t smbus_sbd_read(struct file *filep, char *buffer,
++                              size_t buflen)
++{
++  irqstate_t flags;
++  struct smbus_sbd_dev_s *dev;
++  struct smbus_sbd_data_s *read_data;
++
++  /* Make sure that the read process (i.e. copying data from the SMBus Smart
++   * Battery Data slave driver) cannot be interrupted.
++   */
++
++  flags = enter_critical_section();
++
++  if (buflen < sizeof(struct smbus_sbd_data_s))
++    {
++      /* Something went wrong. The provided buffer length is not sufficient
++       * for a smbus_sbd_data_s struct.  Return zero to indicate that
++       * nothing was read.
++       */
++
++      return 0;
++    }
++
++  /* Retrieve the SMBus Smart Battery Data slave device struct and the data
++   * struct that holds the new data that should be copied to the SMBus Smart
++   * Battery Data slave driver.
++   */
++
++  DEBUGASSERT(filep && filep->f_inode && filep->f_inode->i_private);
++  dev = (struct smbus_sbd_dev_s *)filep->f_inode->i_private;
++
++  DEBUGASSERT(buffer);
++  read_data = (struct smbus_sbd_data_s *)buffer;
++
++  /* Copy the new data into the SMBus Smart Battery Data slave device
++   * struct
++   */
++
++  read_data->temperature              = dev->data->temperature;
++  read_data->voltage                  = dev->data->voltage;
++  read_data->current                  = dev->data->current;
++  read_data->average_current          = dev->data->average_current;
++  read_data->max_error                = dev->data->max_error;
++  read_data->relative_state_of_charge = dev->data->relative_state_of_charge;
++  read_data->absolute_state_of_charge = dev->data->absolute_state_of_charge;
++  read_data->remaining_capacity       = dev->data->remaining_capacity;
++  read_data->full_charge_capacity     = dev->data->full_charge_capacity;
++  read_data->run_time_to_empty        = dev->data->run_time_to_empty;
++  read_data->average_time_to_empty    = dev->data->average_time_to_empty;
++
++  read_data->cycle_count              = dev->data->cycle_count;
++  read_data->design_capacity          = dev->data->design_capacity;
++  read_data->design_voltage           = dev->data->design_voltage;
++  read_data->manufacture_date         = dev->data->manufacture_date;
++  read_data->serial_number            = dev->data->serial_number;
++  read_data->manufacturer_name        = dev->data->manufacturer_name;
++  read_data->device_name              = dev->data->device_name;
++  read_data->device_chemistry         = dev->data->device_chemistry;
++  read_data->manufacturer_data        = dev->data->manufacturer_data;
++  read_data->manufacturer_data_length = dev->data->manufacturer_data_length;
++
++  read_data->cell1_voltage            = dev->data->cell1_voltage;
++  read_data->cell2_voltage            = dev->data->cell2_voltage;
++  read_data->cell3_voltage            = dev->data->cell3_voltage;
++  read_data->cell4_voltage            = dev->data->cell4_voltage;
++  read_data->cell5_voltage            = dev->data->cell5_voltage;
++  read_data->cell6_voltage            = dev->data->cell6_voltage;
++  read_data->cell7_voltage            = dev->data->cell7_voltage;
++  read_data->cell8_voltage            = dev->data->cell8_voltage;
++  read_data->cell9_voltage            = dev->data->cell9_voltage;
++  read_data->cell10_voltage           = dev->data->cell10_voltage;
++  read_data->cell11_voltage           = dev->data->cell11_voltage;
++  read_data->cell12_voltage           = dev->data->cell12_voltage;
++  read_data->cell13_voltage           = dev->data->cell13_voltage;
++  read_data->cell14_voltage           = dev->data->cell14_voltage;
++
++  leave_critical_section(flags);
++
++  return buflen;
++}
++
++/****************************************************************************
++ * Name: smbus_sbd_write
++ *
++ * Description:
++ *   Updates the battery data of the SMBus Smart Battery Data slave driver.
++ *   The data is contained in a smbus_sbd_data_s struct that needs to be
++ *   converted to a character buffer.  This data is then copied into the
++ *   private data structure of the SMBus Smart Battery Data slave driver and
++ *   used to prepare a write buffer for the I2C slave when a valid request is
++ *   received on the I2C bus.
++ *
++ * Input Parameters:
++ *   filep  - Instance of file struct
++ *   buffer - Pointer to a smbus_sbd_data_s struct (cast to a
++ *            (const char *)) containing updated battery data.
++ *   buflen - Size of the provided smbus_sbd_data_s struct
++ *
++ * Returned Value:
++ *   On success, buflen is returned to indicate that all data has been
++ *   copied.  Zero will be returned if the provided buffer length is not
++ *   sufficient for a smbus_sbd_data_s struct.
++ *
++ ****************************************************************************/
++
++static ssize_t smbus_sbd_write(struct file *filep, const char *buffer,
++                               size_t buflen)
++{
++  irqstate_t flags;
++  struct smbus_sbd_dev_s *dev;
++  struct smbus_sbd_data_s *new_data;
++
++  /* Make sure that the write process (i.e. copying new data to the SMBus
++   * Smart Battery Data slave driver) cannot be interrupted.
++   */
++
++  flags = enter_critical_section();
++
++  if (buflen < sizeof(struct smbus_sbd_data_s))
++    {
++      /* Something went wrong. The provided buffer length is not sufficient
++       * for a smbus_sbd_data_s struct.  Return zero to indicate that
++       * nothing was written.
++       */
++
++      return 0;
++    }
++
++  /* Retrieve the SMBus Smart Battery Data slave device struct and the data
++   * struct that holds the new data that should be copied to the SMBus Smart
++   * Battery Data slave driver.
++   */
++
++  DEBUGASSERT(filep && filep->f_inode && filep->f_inode->i_private);
++  dev = (struct smbus_sbd_dev_s *)filep->f_inode->i_private;
++
++  DEBUGASSERT(buffer);
++  new_data = (struct smbus_sbd_data_s *)buffer;
++
++  /* Copy the new data into the SMBus Smart Battery Data slave device
++   * struct
++   */
++
++  dev->data->temperature              = new_data->temperature;
++  dev->data->voltage                  = new_data->voltage;
++  dev->data->current                  = new_data->current;
++  dev->data->average_current          = new_data->average_current;
++  dev->data->max_error                = new_data->max_error;
++  dev->data->relative_state_of_charge = new_data->relative_state_of_charge;
++  dev->data->absolute_state_of_charge = new_data->absolute_state_of_charge;
++  dev->data->remaining_capacity       = new_data->remaining_capacity;
++  dev->data->full_charge_capacity     = new_data->full_charge_capacity;
++  dev->data->run_time_to_empty        = new_data->run_time_to_empty;
++  dev->data->average_time_to_empty    = new_data->average_time_to_empty;
++
++  dev->data->cycle_count              = new_data->cycle_count;
++  dev->data->design_capacity          = new_data->design_capacity;
++  dev->data->design_voltage           = new_data->design_voltage;
++  dev->data->manufacture_date         = new_data->manufacture_date;
++  dev->data->serial_number            = new_data->serial_number;
++  dev->data->manufacturer_name        = new_data->manufacturer_name;
++  dev->data->device_name              = new_data->device_name;
++  dev->data->device_chemistry         = new_data->device_chemistry;
++  dev->data->manufacturer_data        = new_data->manufacturer_data;
++  dev->data->manufacturer_data_length = new_data->manufacturer_data_length;
++
++  dev->data->cell1_voltage            = new_data->cell1_voltage;
++  dev->data->cell2_voltage            = new_data->cell2_voltage;
++  dev->data->cell3_voltage            = new_data->cell3_voltage;
++  dev->data->cell4_voltage            = new_data->cell4_voltage;
++  dev->data->cell5_voltage            = new_data->cell5_voltage;
++  dev->data->cell6_voltage            = new_data->cell6_voltage;
++  dev->data->cell7_voltage            = new_data->cell7_voltage;
++  dev->data->cell8_voltage            = new_data->cell8_voltage;
++  dev->data->cell9_voltage            = new_data->cell9_voltage;
++  dev->data->cell10_voltage           = new_data->cell10_voltage;
++  dev->data->cell11_voltage           = new_data->cell11_voltage;
++  dev->data->cell12_voltage           = new_data->cell12_voltage;
++  dev->data->cell13_voltage           = new_data->cell13_voltage;
++  dev->data->cell14_voltage           = new_data->cell14_voltage;
++
++  leave_critical_section(flags);
++
++  return buflen;
++}
++
++/****************************************************************************
++ * Name: smbus_sbd_callback
++ *
++ * Description:
++ *   Callback function that is to be invoked by the I2C slave driver when
++ *   data has been received.  The received data will be checked against a
++ *   list of registers that can be requested from a smart battery.  If there
++ *   is a match the requested data will be put into the write buffer that is
++ *   used by the I2C slave driver when a bus master wants to read the data.
++ *
++ * Input Parameters:
++ *   arg    - Pointer to the SMBus Smart Battery Data slave device struct
++ *
++ * Returned Value:
++ *   OK if a new write buffer was successfully registered in response to the
++ *   received command; A negated errno value is returned on any failure.
++ *
++ ****************************************************************************/
++
++static int smbus_sbd_callback(void *arg, size_t rx_len)
++{
++  struct smbus_sbd_dev_s *dev;
++  int buffer_length;
++  int i;
++
++  /* Retrieve the pointer to the SMBus SBD slave device struct */
++
++  dev = (struct smbus_sbd_dev_s *)arg;
++  DEBUGASSERT(dev && dev->i2c_slave_dev);
++
++  /* Check which register was requested and prepare the write buffer */
++
++  switch (dev->read_buffer[0])
++    {
++      case SBD_TEMPERATURE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->temperature);
++          dev->write_buffer[1] = HIBYTE(dev->data->temperature);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CURRENT:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->current);
++          dev->write_buffer[1] = HIBYTE(dev->data->current);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_AVERAGE_CURRENT:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->average_current);
++          dev->write_buffer[1] = HIBYTE(dev->data->average_current);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_MAX_ERROR:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->max_error);
++          dev->write_buffer[1] = HIBYTE(dev->data->max_error);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_RELATIVE_STATE_OF_CHARGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->relative_state_of_charge);
++          dev->write_buffer[1] = HIBYTE(dev->data->relative_state_of_charge);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_ABSOLUTE_STATE_OF_CHARGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->absolute_state_of_charge);
++          dev->write_buffer[1] = HIBYTE(dev->data->absolute_state_of_charge);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_REMAINING_CAPACITY:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->remaining_capacity);
++          dev->write_buffer[1] = HIBYTE(dev->data->remaining_capacity);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_FULL_CHARGE_CAPACITY:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->full_charge_capacity);
++          dev->write_buffer[1] = HIBYTE(dev->data->full_charge_capacity);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_RUN_TIME_TO_EMPTY:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->run_time_to_empty);
++          dev->write_buffer[1] = HIBYTE(dev->data->run_time_to_empty);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_AVERAGE_TIME_TO_EMPTY:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->average_time_to_empty);
++          dev->write_buffer[1] = HIBYTE(dev->data->average_time_to_empty);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CYCLE_COUNT:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cycle_count);
++          dev->write_buffer[1] = HIBYTE(dev->data->cycle_count);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_DESIGN_CAPACITY:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->design_capacity);
++          dev->write_buffer[1] = HIBYTE(dev->data->design_capacity);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_DESIGN_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->design_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->design_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_MANUFACTURE_DATE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->manufacture_date);
++          dev->write_buffer[1] = HIBYTE(dev->data->manufacture_date);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_SERIAL_NUMBER:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->serial_number);
++          dev->write_buffer[1] = HIBYTE(dev->data->serial_number);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_MANUFACTURER_NAME:
++        {
++          if (dev->data->manufacturer_name == NULL)
++            {
++              /* No manufacturer name was set. Return an empty string. */
++
++              dev->write_buffer[0] = 0;
++              buffer_length = 1;
++            }
++          else
++            {
++              /* Determine how many characters to put into the write buffer,
++               * but it can be at most 15.  The buffer can hold 16 bytes,
++               * including the first byte that indicates the string length.
++               */
++
++              dev->write_buffer[0] =
++                strnlen(dev->data->manufacturer_name, 15);
++
++              /* Fill the write buffer */
++
++              for (i = 0; i < dev->write_buffer[0]; i++)
++                {
++                  dev->write_buffer[i + 1] =
++                    (uint8_t)dev->data->manufacturer_name[i];
++                }
++
++              buffer_length = (dev->write_buffer[0] + 1);
++            }
++        }
++        break;
++
++      case SBD_DEVICE_NAME:
++        {
++          if (dev->data->device_name == NULL)
++            {
++              /* No device name was set. Return an empty string. */
++
++              dev->write_buffer[0] = 0;
++              buffer_length = 1;
++            }
++          else
++            {
++              /* Determine how many characters to put into the write buffer,
++               * but it can be at most 15.  The buffer can hold 16 bytes,
++               * including the first byte that indicates the string length.
++               */
++
++              dev->write_buffer[0] = strnlen(dev->data->device_name, 15);
++
++              /* Fill the write buffer */
++
++              for (i = 0; i < dev->write_buffer[0]; i++)
++                {
++                  dev->write_buffer[i + 1] =
++                    (uint8_t)dev->data->device_name[i];
++                }
++
++              buffer_length = (dev->write_buffer[0] + 1);
++            }
++        }
++        break;
++
++      case SBD_DEVICE_CHEMISTRY:
++        {
++          if (dev->data->device_chemistry == NULL)
++            {
++              /* No device chemistry was set. Return an empty string. */
++
++              dev->write_buffer[0] = 0;
++              buffer_length = 1;
++            }
++          else
++            {
++              /* Determine how many characters to put into the write buffer,
++               * but it can be at most 15.  The buffer can hold 16 bytes,
++               * including the first byte that indicates the string length.
++               */
++
++              dev->write_buffer[0] =
++                strnlen(dev->data->device_chemistry, 15);
++
++              /* Fill the write buffer */
++
++              for (i = 0; i < dev->write_buffer[0]; i++)
++                {
++                  dev->write_buffer[i + 1] =
++                    (uint8_t)dev->data->device_chemistry[i];
++                }
++
++              buffer_length = (dev->write_buffer[0] + 1);
++            }
++        }
++        break;
++
++      case SBD_MANUFACTURER_DATA:
++        {
++          if (dev->data->manufacturer_data == NULL)
++            {
++              /* No manufacturer data was set. Return an empty dataset. */
++
++              dev->write_buffer[0] = 0;
++              buffer_length = 1;
++            }
++          else
++            {
++              /* Determine how many bytes to put into the write buffer */
++
++              dev->write_buffer[0] = dev->data->manufacturer_data_length;
++              if (dev->write_buffer[0] > 15)
++                {
++                  dev->write_buffer[0] = 15;
++
++                  /* The write buffer can only hold 16 bytes, including the
++                   * first byte that indicates the length of the byte array.
++                   * The array has to be limited to 15 bytes if it is longer.
++                   */
++                }
++
++              /* Fill the write buffer */
++
++              for (i = 0; i < dev->write_buffer[0]; i++)
++                {
++                  dev->write_buffer[i + 1] = dev->data->manufacturer_data[i];
++                }
++
++              buffer_length = (dev->write_buffer[0] + 1);
++            }
++        }
++        break;
++
++      case SBD_CELL14_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell14_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell14_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL13_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell13_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell13_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL12_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell12_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell12_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL11_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell11_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell11_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL10_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell10_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell10_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL9_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell9_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell9_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL8_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell8_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell8_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL7_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell7_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell7_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL6_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell6_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell6_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL5_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell5_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell5_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL4_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell4_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell4_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL3_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell3_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell3_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL2_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell2_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell2_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      case SBD_CELL1_VOLTAGE:
++        {
++          dev->write_buffer[0] = LOBYTE(dev->data->cell1_voltage);
++          dev->write_buffer[1] = HIBYTE(dev->data->cell1_voltage);
++          buffer_length = 2;
++        }
++        break;
++
++      default:
++        {
++          /* Set an empty write buffer with zero length if the requested
++           * register does not exist (or is not yet supported).  The I2C
++           * slave will usually handle an empty buffer by sending zero bytes.
++           */
++
++          return I2CS_WRITE(dev->i2c_slave_dev, NULL, 0);
++        }
++        break;
++    }
++
++  /* Install the (re)filled write buffer.  Technically this buffer needs to
++   * be constant, but we want to be able to re-use the same buffer for the
++   * next request, so we just cast the buffer to const.  This should not
++   * cause any problems, because the write buffer is only changed when the
++   * I2C slave driver invokes this callback, which only happens when a new
++   * request has been received.
++   */
++
++  return I2CS_WRITE(dev->i2c_slave_dev, (const uint8_t *)dev->write_buffer,
++                    buffer_length);
++}
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: smbus_sbd_initialize
++ *
++ * Description:
++ *   Create and register a SMBus Smart Battery Data slave character driver.
++ *
++ *   This character driver supports (a subset of) the Smart Battery Data
++ *   Specification, Revision 1.1.  This driver provides a buffer to the I2C
++ *   slave driver.  This buffer can be updated at regular intervals by a
++ *   user-space application.
++ *
++ * Input Parameters:
++ *   minor         - The SMBus Smart Battery Data slave character device will
++ *                   be registered as /dev/smbus-sbdN where N is the
++ *                   minor number
++ *   i2c_slave_dev - An instance of the lower half I2C slave driver
++ *
++ * Returned Value:
++ *   OK if the driver was successfully registered; A negated errno value is
++ *   returned on any failure.
++ *
++ ****************************************************************************/
++
++int smbus_sbd_initialize(int minor, struct i2c_slave_s *i2c_slave_dev)
++{
++  irqstate_t flags;
++  struct smbus_sbd_dev_s *smbus_sbd_dev;
++  char dev_name[24];
++  int ret;
++
++  /* Make sure the initialization is not interrupted */
++
++  flags = enter_critical_section();
++
++  /* Allocate an SMBus Smart Battery Data slave device structure */
++
++  smbus_sbd_dev =
++    (struct smbus_sbd_dev_s *)kmm_zalloc(sizeof(struct smbus_sbd_dev_s));
++
++  if (smbus_sbd_dev == NULL)
++    {
++      leave_critical_section(flags);
++      return -ENOMEM;
++    }
++  else
++    {
++      /* Create the device name string */
++
++      snprintf(dev_name, 24, "/dev/smbus-sbd%d", minor);
++
++      /* Register the driver.  The associated private data is a reference to
++       * the SMBus Smart Battery Data slave device structure.
++       */
++
++      ret = register_driver(dev_name, &smbus_sbd_fops, 0, smbus_sbd_dev);
++      if (ret < 0)
++        {
++          ferr("register_driver failed: %d\n", -ret);
++          kmm_free(smbus_sbd_dev);
++
++          leave_critical_section(flags);
++          return ret;
++        }
++    }
++
++  /* Allocate the SMBus Smart Battery Data slave data structure */
++
++  smbus_sbd_dev->data =
++    (struct smbus_sbd_data_s *)kmm_zalloc(sizeof(struct smbus_sbd_data_s));
++
++  if (smbus_sbd_dev->data == NULL)
++    {
++      leave_critical_section(flags);
++      return -ENOMEM;
++    }
++
++  /* Set-up the I2C slave device.  Install a read-buffer as well as a
++   * callback, which will receive the SMBus Smart Battery Data slave device
++   * structure as an argument.
++   */
++
++  DEBUGASSERT(i2c_slave_dev);
++  smbus_sbd_dev->i2c_slave_dev = i2c_slave_dev;
++
++  ret = I2CS_READ(smbus_sbd_dev->i2c_slave_dev,
++                  smbus_sbd_dev->read_buffer, 3);
++  if (ret < 0)
++    {
++      leave_critical_section(flags);
++      return ret;
++    }
++
++  ret = I2CS_REGISTERCALLBACK(smbus_sbd_dev->i2c_slave_dev,
++                              smbus_sbd_callback, (void *)smbus_sbd_dev);
++  if (ret < 0)
++    {
++      leave_critical_section(flags);
++      return ret;
++    }
++
++  leave_critical_section(flags);
++  return 0;
++}
++
++#endif /* CONFIG_SMBUS_SBD */
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_spi.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_spi.c
+new file mode 100644
+index 0000000000..a977eccd2e
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_spi.c
+@@ -0,0 +1,169 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_spi.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++#include <nuttx/compiler.h>
++
++#include <sys/types.h>
++#include <stdint.h>
++#include <stdbool.h>
++#include <errno.h>
++#include <debug.h>
++
++#include <nuttx/spi/spi.h>
++#include <nuttx/spi/spi_transfer.h>
++
++#include "s32k1xx_pin.h"
++#include "s32k1xx_lpspi.h"
++
++#include <arch/board/board.h>
++
++#include "mr-bms771.h"
++
++#ifdef CONFIG_S32K1XX_LPSPI
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: s32k1xx_spidev_initialize
++ *
++ * Description:
++ *   Configure chip select pins, initialize the SPI driver and register
++ *   /dev/spiN devices.
++ *
++ ****************************************************************************/
++
++int weak_function s32k1xx_spidev_initialize(void)
++{
++  int ret = OK;
++
++#ifdef CONFIG_S32K1XX_LPSPI0
++  /* LPSPI0 *****************************************************************/
++
++  /* Configure LPSPI0 peripheral chip select pins */
++
++  s32k1xx_pinconfig(PIN_LPSPI0_PCS);
++
++#  ifdef CONFIG_SPI_DRIVER
++  /* Initialize the SPI driver for LPSPI0 */
++
++  struct spi_dev_s *g_lpspi0 = s32k1xx_lpspibus_initialize(0);
++  if (g_lpspi0 == NULL)
++    {
++      spierr("ERROR: FAILED to initialize LPSPI0\n");
++      return -ENODEV;
++    }
++
++  ret = spi_register(g_lpspi0, 0);
++  if (ret < 0)
++    {
++      spierr("ERROR: FAILED to register LPSPI0 driver\n");
++      return ret;
++    }
++#  endif /* CONFIG_SPI_DRIVER */
++#endif /* CONFIG_S32K1XX_LPSPI0 */
++
++#ifdef CONFIG_S32K1XX_LPSPI1
++  /* LPSPI1 *****************************************************************/
++
++  /* Configure LPSPI1 peripheral chip select pins */
++
++  s32k1xx_pinconfig(PIN_LPSPI1_PCS);
++
++#  ifdef CONFIG_SPI_DRIVER
++  /* Initialize the SPI driver for LPSPI1 */
++
++  struct spi_dev_s *g_lpspi1 = s32k1xx_lpspibus_initialize(1);
++  if (g_lpspi1 == NULL)
++    {
++      spierr("ERROR: FAILED to initialize LPSPI1\n");
++      return -ENODEV;
++    }
++
++  ret = spi_register(g_lpspi1, 1);
++  if (ret < 0)
++    {
++      spierr("ERROR: FAILED to register LPSPI1 driver\n");
++      return ret;
++    }
++#  endif /* CONFIG_SPI_DRIVER */
++#endif /* CONFIG_S32K1XX_LPSPI1 */
++
++  return ret;
++}
++
++/****************************************************************************
++ * Name: s32k1xx_lpspiNselect and s32k1xx_lpspiNstatus
++ *
++ * Description:
++ *   The external functions, s32k1xx_lpspiNselect* and s32k1xx_lpspiNstatus
++ *   must be provided by board-specific logic.  They are implementations of
++ *   the select and status methods of the SPI interface defined by struct
++ *   spi_ops_s (see include/nuttx/spi/spi.h).  All other methods (including
++ *   s32k1xx_lpspibus_initialize()) are provided by common logic.  To use
++ *   this common SPI logic on your board:
++ *
++ *   1. Provide logic in s32k1xx_boardinitialize() to configure SPI chip
++ *      select pins.
++ *   2. Provide s32k1xx_lpspiNselect() and s32k1xx_lpspiNstatus() functions
++ *      in your board-specific logic.  These functions will perform chip
++ *      selection and status operations using GPIOs in the way your board is
++ *      configured.
++ *   3. Add a calls to s32k1xx_lpspibus_initialize() in your low level
++ *      application initialization logic.
++ *   4. The handle returned by s32k1xx_lpspibus_initialize() may then be used
++ *      to bind the SPI driver to higher level logic (e.g., calling
++ *      mmcsd_spislotinitialize(), for example, will bind the SPI driver to
++ *      the SPI MMC/SD driver).
++ *
++ * NOTE*: If CONFIG_S32K1XX_LPSPI_HWPCS is selected, s32k1xx_lpspiNselect()
++ *        does NOT need to provided by board-specific logic.  In this case a
++ *        generic implementation is used that switches between native
++ *        hardware chip select pins.  It is important that all pins are
++ *        configured when the SPI bus is initialized.
++ *
++ ****************************************************************************/
++
++#ifdef CONFIG_S32K1XX_LPSPI0
++/* LPSPI0 *******************************************************************/
++
++uint8_t s32k1xx_lpspi0status(struct spi_dev_s *dev, uint32_t devid)
++{
++  return 0;
++}
++#endif /* CONFIG_S32K1XX_LPSPI0 */
++
++#ifdef CONFIG_S32K1XX_LPSPI1
++/* LPSPI1 *******************************************************************/
++
++uint8_t s32k1xx_lpspi1status(struct spi_dev_s *dev, uint32_t devid)
++{
++  return 0;
++}
++#endif /* CONFIG_S32K1XX_LPSPI1 */
++#endif /* CONFIG_S32K1XX_LPSPI */
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_ssd1306.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_ssd1306.c
+new file mode 100644
+index 0000000000..9616d67713
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_ssd1306.c
+@@ -0,0 +1,113 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_ssd1306.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++#include <debug.h>
++#include <errno.h>
++#include <nuttx/board.h>
++#include <nuttx/i2c/i2c_master.h>
++#include <nuttx/lcd/lcd.h>
++#include <nuttx/lcd/ssd1306.h>
++
++#include "s32k1xx_lpi2c.h"
++
++#if defined(CONFIG_I2C) && defined(CONFIG_S32K1XX_LPI2C0) && \
++    defined(CONFIG_LCD_SSD1306_I2C)
++
++/****************************************************************************
++ * Private Data
++ ****************************************************************************/
++
++static struct lcd_dev_s *s32k1xx_ssd1306_dev;
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: board_lcd_initialize
++ ****************************************************************************/
++
++int board_lcd_initialize(void)
++{
++  struct i2c_master_s *lpi2c0;
++  int ret = OK;
++
++  /* Initialize LPI2C0 */
++
++  lpi2c0 = s32k1xx_i2cbus_initialize(0);
++  if (lpi2c0 == NULL)
++    {
++      i2cerr("ERROR: Failed to initialize LPI2C0\n");
++      return -ENODEV;
++    }
++
++  /* Initialize SSD1306 on LPI2C0 */
++
++  lcdinfo("Initialize SSD1306 on LPI2C0\n");
++
++  s32k1xx_ssd1306_dev = ssd1306_initialize(lpi2c0, NULL, 0);
++  if (s32k1xx_ssd1306_dev == NULL)
++    {
++      lcderr("ERROR: Failed to initialize SSD1306 on LPI2C0\n");
++      s32k1xx_i2cbus_uninitialize(lpi2c0);
++      return -ENODEV;
++    }
++
++  lcdinfo("Successfully initialized SSD1306 on LPI2C0\n");
++
++  return ret;
++}
++
++/****************************************************************************
++ * Name: board_lcd_getdev
++ ****************************************************************************/
++
++struct lcd_dev_s *board_lcd_getdev(int devno)
++{
++  /* Only one display device with devno 0 is supported */
++
++  if (devno == 0)
++    {
++      return s32k1xx_ssd1306_dev;
++    }
++
++  return NULL;
++}
++
++/****************************************************************************
++ * Name: board_lcd_uninitialize
++ ****************************************************************************/
++
++void board_lcd_uninitialize(void)
++{
++  /* Turn off the power to uninitialize */
++
++  s32k1xx_ssd1306_dev->setpower(s32k1xx_ssd1306_dev, 0);
++}
++
++#endif /* CONFIG_I2C && CONFIG_S32K1XX_LPI2C0 && CONFIG_LCD_SSD1306_I2C */
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_uid.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_uid.c
+new file mode 100644
+index 0000000000..ff980525df
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_uid.c
+@@ -0,0 +1,67 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_uid.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++#include <nuttx/board.h>
++#include <nuttx/compiler.h>
++#include <stddef.h>
++#include <stdint.h>
++#include <errno.h>
++
++#include "s32k1xx_uid.h"
++
++#ifdef CONFIG_BOARDCTL_UNIQUEID
++
++/****************************************************************************
++ * Pre-processor Definitions
++ ****************************************************************************/
++
++#if CONFIG_BOARDCTL_UNIQUEID_SIZE != S32K1XX_UID_SIZE
++#  error CONFIG_BOARDCTL_UNIQUEID_SIZE does not match S32K1XX_UID_SIZE
++#endif
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: board_uniqueid
++ ****************************************************************************/
++
++int board_uniqueid(uint8_t *uniqueid)
++{
++  if (uniqueid == NULL)
++    {
++      return -EINVAL;
++    }
++
++  s32k1xx_get_uniqueid(uniqueid);
++
++  return OK;
++}
++
++#endif /* CONFIG_BOARDCTL_UNIQUEID */
+diff --git a/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_userleds.c b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_userleds.c
+new file mode 100644
+index 0000000000..7dc8655c5c
+--- /dev/null
++++ b/boards/arm/s32k1xx/mr-bms771/src/s32k1xx_userleds.c
+@@ -0,0 +1,122 @@
++/****************************************************************************
++ * boards/arm/s32k1xx/mr-bms771/src/s32k1xx_userleds.c
++ *
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.  The
++ * ASF licenses this file to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance with the
++ * License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
++ * License for the specific language governing permissions and limitations
++ * under the License.
++ *
++ ****************************************************************************/
++
++/* Copyright 2022-2025 NXP */
++
++/****************************************************************************
++ * Included Files
++ ****************************************************************************/
++
++#include <nuttx/config.h>
++
++#include <stdint.h>
++#include <stdbool.h>
++
++#include <nuttx/board.h>
++
++#include "s32k1xx_pin.h"
++
++#include <arch/board/board.h>
++
++#include "mr-bms771.h"
++
++#ifndef CONFIG_ARCH_LEDS
++
++/****************************************************************************
++ * Public Functions
++ ****************************************************************************/
++
++/****************************************************************************
++ * Name: board_userled_initialize
++ ****************************************************************************/
++
++uint32_t board_userled_initialize(void)
++{
++  /* Configure LED GPIOs for output */
++
++  s32k1xx_pinconfig(GPIO_LED_R);
++  s32k1xx_pinconfig(GPIO_LED_G);
++  s32k1xx_pinconfig(GPIO_LED_B);
++
++  return BOARD_NLEDS;
++}
++
++/****************************************************************************
++ * Name: board_userled
++ ****************************************************************************/
++
++void board_userled(int led, bool ledon)
++{
++  uint32_t ledcfg;
++
++  if (led == BOARD_LED_R)
++    {
++      ledcfg = GPIO_LED_R;
++    }
++  else if (led == BOARD_LED_G)
++    {
++      ledcfg = GPIO_LED_G;
++    }
++  else if (led == BOARD_LED_B)
++    {
++      ledcfg = GPIO_LED_B;
++    }
++  else
++    {
++      return;
++    }
++
++  /* Invert output, an output of '0' illuminates the LED */
++
++  s32k1xx_gpiowrite(ledcfg, !ledon);
++}
++
++/****************************************************************************
++ * Name: board_userled_all
++ ****************************************************************************/
++
++void board_userled_all(uint32_t ledset)
++{
++  /* Invert output, an output of '0' illuminates the LED */
++
++  s32k1xx_gpiowrite(GPIO_LED_R, !((ledset & BOARD_LED_R_BIT) != 0));
++  s32k1xx_gpiowrite(GPIO_LED_G, !((ledset & BOARD_LED_G_BIT) != 0));
++  s32k1xx_gpiowrite(GPIO_LED_B, !((ledset & BOARD_LED_B_BIT) != 0));
++}
++
++#ifdef CONFIG_USERLED_LOWER_READSTATE
++/****************************************************************************
++ * Name: board_userled_getall
++ ****************************************************************************/
++
++void board_userled_getall(uint32_t *ledset)
++{
++  /* Clear the LED bits */
++
++  *ledset = 0;
++
++  /* Get LED state. Invert value, an output of '0' illuminates the LED. */
++
++  *ledset |= (((!s32k1xx_gpioread(GPIO_LED_R)) & 1) << BOARD_LED_R);
++  *ledset |= (((!s32k1xx_gpioread(GPIO_LED_G)) & 1) << BOARD_LED_G);
++  *ledset |= (((!s32k1xx_gpioread(GPIO_LED_B)) & 1) << BOARD_LED_B);
++}
++#endif /* CONFIG_USERLED_LOWER_READSTATE */
++#endif /* !CONFIG_ARCH_LEDS */
+diff --git a/boards/arm/s32k1xx/rddrone-bms772/Kconfig b/boards/arm/s32k1xx/rddrone-bms772/Kconfig
+index 5876721316..6a45f638a4 100644
+--- a/boards/arm/s32k1xx/rddrone-bms772/Kconfig
++++ b/boards/arm/s32k1xx/rddrone-bms772/Kconfig
+@@ -24,159 +24,4 @@ config SMBUS_SBD
+ 		specifically implementing a subset of the Smart Battery Data
+ 		Specification, Revision 1.1
+ 
+-menu "RDDRONE-BMS772 PM configuration"
+-depends on PM
+-
+-menu "PM configuration for PM_STANDBY mode"
+-
+-choice
+-	prompt "MCU power mode during PM_STANDBY"
+-	default VLPR_STANDBY
+-
+-config RUN_STANDBY
+-	bool "MCU in RUN mode during PM_STANDBY"
+-	---help---
+-		The MCU should remain in RUN mode during PM_STANDBY
+-
+-config VLPR_STANDBY
+-	bool "MCU in VLPR mode during PM_STANDBY"
+-	---help---
+-		The MCU should enter VLPR (very low power run) mode during PM_STANDBY
+-
+-endchoice # MCU power mode
+-
+-menuconfig PM_SPI_STANDBY
+-	bool "Enable SPI in PM_STANDBY mode"
+-	default n
+-	depends on SPI
+-	---help---
+-		Enable PM configuration for SPI
+-
+-if PM_SPI_STANDBY
+-
+-config PM_SPI0_STANDBY
+-	bool "Enable LPSPI0 in PM_STANDBY mode"
+-	default n
+-	depends on S32K1XX_LPSPI0
+-
+-config PM_SPI1_STANDBY
+-	bool "Enable LPSPI1 in PM_STANDBY mode"
+-	default n
+-	depends on S32K1XX_LPSPI1
+-
+-endif # PM_SPI_STANDBY
+-
+-menuconfig PM_SERIAL_STANDBY
+-	bool "Enable serial in PM_STANDBY mode"
+-	default n
+-	depends on SERIAL
+-	---help---
+-		Enable PM configuration for SERIAL
+-
+-if PM_SERIAL_STANDBY
+-
+-config PM_CONSOLE_STANDBY
+-	bool "Enable serial console in PM_STANDBY"
+-	default n
+-	depends on SERIAL_CONSOLE
+-	select PM_SERIAL0_STANDBY if LPUART0_SERIAL_CONSOLE
+-	select PM_SERIAL1_STANDBY if LPUART1_SERIAL_CONSOLE
+-	select PM_SERIAL2_STANDBY if LPUART2_SERIAL_CONSOLE
+-
+-config PM_SERIAL0_STANDBY
+-	bool "Enable LPUART0 in PM_STANDBY mode"
+-	default n
+-	depends on S32K1XX_LPUART0
+-
+-config PM_SERIAL1_STANDBY
+-	bool "Enable LPUART1 in PM_STANDBY mode"
+-	default n
+-	depends on S32K1XX_LPUART1
+-
+-config PM_SERIAL2_STANDBY
+-	bool "Enable LPUART2 in PM_STANDBY mode"
+-	default n
+-	depends on S32K1XX_LPUART2
+-
+-endif # PM_SERIAL_STANDBY
+-
+-endmenu # PM configuration for PM_STANDBY mode
+-
+-menu "PM configuration for PM_SLEEP mode"
+-
+-choice
+-	prompt "MCU power mode during PM_SLEEP"
+-	default VLPR_SLEEP
+-
+-config RUN_SLEEP
+-	bool "MCU in RUN mode during PM_SLEEP"
+-	---help---
+-		The MCU should remain in RUN mode during PM_SLEEP
+-
+-config VLPR_SLEEP
+-	bool "MCU in VLPR mode during PM_STANDBY"
+-	---help---
+-		The MCU should enter VLPR (very low power run) mode during PM_SLEEP
+-
+-endchoice # MCU power mode
+-
+-menuconfig PM_SPI_SLEEP
+-	bool "Enable SPI in PM_SLEEP mode"
+-	default n
+-	depends on SPI
+-	---help---
+-		Enable PM configuration for SPI
+-
+-if PM_SPI_SLEEP
+-
+-menuconfig PM_SPI0_SLEEP
+-	bool "Enable LPSPI0 in PM_SLEEP"
+-	default n
+-	depends on S32K1XX_LPSPI0
+-
+-menuconfig PM_SPI1_SLEEP
+-	bool "Enable LPSPI1 in PM_SLEEP"
+-	default n
+-	depends on S32K1XX_LPSPI1
+-
+-endif # PM_SPI_SLEEP
+-
+-menuconfig PM_SERIAL_SLEEP
+-	bool "Enable serial in PM_SLEEP mode"
+-	default n
+-	depends on SERIAL
+-	---help---
+-		Enable PM configuration for SERIAL
+-
+-if PM_SERIAL_SLEEP
+-
+-config PM_CONSOLE_SLEEP
+-	bool "Enable serial console in PM_SLEEP"
+-	default n
+-	depends on SERIAL_CONSOLE
+-	select PM_SERIAL0_SLEEP if LPUART0_SERIAL_CONSOLE
+-	select PM_SERIAL1_SLEEP if LPUART1_SERIAL_CONSOLE
+-	select PM_SERIAL2_SLEEP if LPUART2_SERIAL_CONSOLE
+-
+-config PM_SERIAL0_SLEEP
+-	bool "Enable LPUART0 in PM_SLEEP mode"
+-	default n
+-	depends on S32K1XX_LPUART0
+-
+-config PM_SERIAL1_SLEEP
+-	bool "Enable LPUART1 in PM_SLEEP mode"
+-	default n
+-	depends on S32K1XX_LPUART1
+-
+-config PM_SERIAL2_SLEEP
+-	bool "Enable LPUART2 in PM_SLEEP mode"
+-	default n
+-	depends on S32K1XX_LPUART2
+-
+-endif # PM_SERIAL_SLEEP
+-
+-endmenu # PM configuration for PM_SLEEP mode
+-
+-endmenu # RDDRONE-BMS772 PM configuration
+-
+ endif # ARCH_BOARD_RDDRONE_BMS772
+-- 
+2.25.1
+
