@@ -2880,10 +2880,31 @@ int batManagement_setCCOvrFltEnable(bool enable)
  */
 int batManagement_setCSbFltEnable(bool enable)
 {
-    int lvRetValue;
+    int      lvRetValue;
+    uint16_t retRegVal;
 
     // enable or disable it
     lvRetValue = bcc_configuration_setCSbFltEnable(&gBccDrvConfig, BCC_CID_DEV1, enable);
+
+    // check if the CS wakeup CSB WUP shoud be enabled.
+    // then check if the CS WUP is already active in FAULT1 and clear FAULT1 if needed.
+    if(enable)
+    {
+        // read the FAULT1 register to see if there is a CSB wakeup
+        lvRetValue |= bcc_spiwrapper_BCC_Reg_Read(
+            &gBccDrvConfig, BCC_CID_DEV1, BCC_REG_FAULT1_STATUS_ADDR, 1, &retRegVal);
+
+        // check for CSB wakeup
+        if(retRegVal & BCC_RW_CSB_WUP_FLT_MASK)
+        {
+            // inform user
+            cli_printf("CSB WUP bit alreaedy active in FAULT1, clearing FAULT1 register for sleep transition\r\n");
+            cli_printf("FAULT1: 0x%04X\r\n", retRegVal);
+
+            // clear the CSB fault
+            lvRetValue |= bcc_spiwrapper_BCC_Fault_ClearStatus(&gBccDrvConfig, BCC_CID_DEV1, BCC_FS_FAULT1);
+        }
+    }
 
     return lvRetValue;
 }
