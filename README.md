@@ -75,7 +75,9 @@ Both BMS boards are supported in MBDT, for the MBDT bringup examples see:
 * BMS771: https://community.nxp.com/t5/NXP-Model-Based-Design-Tools/MR-BMS771-Demo-Application/ta-p/1919177
 * BMS772: https://community.nxp.com/t5/NXP-Model-Based-Design-Tools/Example-Model-RDDRONE-BMS772/ta-p/1550394 
 
-There should be a full BMS example on nxp.com.
+For the MBDT BMS examples for RDDRONE-BMS772 and MR-BMS771 see https://github.com/NXPHoverGames/MR-BMS771/tree/master/MBDT.
+Download and extract the patch file "NXP_MBDToolbox_S32K1xx_4.3.3_patch.zip".
+Follow the instruction included to add the BMS examples to the S32K1xx MBDT toolbox.
 
 ## Make sure git and zip are installed
 If git is not installed, open a terminal and type the following commands:
