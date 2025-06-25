@@ -29,6 +29,7 @@ NOTE: Contact NXP sales directly to access additional non-opensource libraries f
 
 For communication with this BMS board, a three examples have been provided. 
 - CyphalCAN or DroneCAN protocol can be used to configure the BMS or provide the needed information.
+- DroneCAN can be used to interact with an FMU in PX4, see https://app.gitbook.com/o/-L9GLsni4p7csCR7QCJ8/s/4sYITYOw8lqjlbpxfe9d/software-guide-px4/how-to-integrate-rddrone-bms-or-mr-bms771-in-px4-via-dronecan how to integrate this BMS into PX4 autopilot.
 - UART can be used to configure the BMS via a console or retrieve the needed information.
 - SMBus can be used to get the information from the BMS.
 - There is also an example on how to use the NTAG5 NFC IC (when populated) to be able to tap the antenna with a phone to read out some data.
